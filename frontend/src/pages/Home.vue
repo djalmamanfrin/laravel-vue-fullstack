@@ -1,6 +1,8 @@
 <script setup>
 import {PhotoIcon} from '@heroicons/vue/24/solid'
 import {ref} from "vue";
+import axiosClient from "../axios.js";
+import router from "../router.js";
 
 const data = ref({
   image: null,
@@ -8,7 +10,13 @@ const data = ref({
 })
 
 function submit() {
-  console.log('submit')
+  const formData = new FormData()
+  formData.append('image', data.value.image)
+  formData.append('label', data.value.label)
+  axiosClient.post('/api/image', formData)
+      .then(res => {
+        router.push({name: 'MyImages'})
+      })
 }
 
 </script>
