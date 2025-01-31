@@ -3,7 +3,6 @@
 </script>
 
 <template>
-  My Images
 </template>
 
 <style scoped>
