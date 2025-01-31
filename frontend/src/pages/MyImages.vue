@@ -1,6 +1,7 @@
 <script setup>
 
-import {ref} from "vue";
+import {onMounted, ref} from "vue";
+import axiosClient from "../axios.js";
 
 const images = ref([])
 
@@ -9,9 +10,23 @@ async function copyImageUrl(url) {
 }
 
 function deleteImage(id) {
-  console.log('delete')
+  if (!confirm("Are you sure you want to delete this image?")) {
+    return;
+  }
+
+  axiosClient.delete(`/api/image/${id}`)
+      .then(response => {
+        images.value = images.value.filter(image => image.id !== id)
+      })
 }
 
+onMounted(() => {
+  axiosClient.get('/api/image')
+      .then((response) => {
+        console.log(response.data);
+        images.value = response.data;
+      })
+})
 
 </script>
 
