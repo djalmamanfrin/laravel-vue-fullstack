@@ -1,6 +1,8 @@
 <script setup>
 import GuestLayout from "../components/GuestLayout.vue";
 import {ref} from "vue";
+import axiosClient from "../axios.js";
+import router from "../router.js";
 
 const data = ref({
   name: '',
@@ -16,7 +18,16 @@ const errors = ref({
 })
 
 function submit() {
-  console.log('subimt')
+  axiosClient.get('/sanctum/csrf-cookie').then(response => {
+    axiosClient.post("/register", data.value)
+        .then(response => {
+          router.push({name: 'Home'})
+        })
+        .catch(error => {
+          console.log(error.response.data)
+          errors.value = error.response.data.errors;
+        })
+  });
 }
 </script>
 
