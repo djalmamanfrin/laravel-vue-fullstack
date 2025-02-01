@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Image;
+use App\Models\Hashtag;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ImageController extends Controller
 {
@@ -31,15 +35,46 @@ class ImageController extends Controller
     {
         $request->validate([
             'image' => ['required', 'file', 'image', 'mimes:jpeg,png,jpg'],
-            'label' => ['nullable', 'string', 'max:255'],
+            'categories' => ['nullable', 'array'],
+            'categories.*' => ['string'],
+            'description' => ['nullable', 'string', 'max:500'],
         ]);
 
         $path = $request->file('image')->store('images', 'public');
 
         $image = Image::create([
             'path' => $path,
-            'label' => $request->label
+            'description' => $request->description
         ]);
+
+        if ($request->filled('description')) {
+            preg_match_all('/#(\w+)/', $request->description, $matches);
+            $hashtags = $matches[1] ?? [];
+
+            $data = [];
+            foreach ($hashtags as $value) {
+                $hashtag = Hashtag::firstOrCreate(
+                    ['slug' => strtolower($value)],
+                    ['value' => $value],
+                );
+                $data[] = ['hashtag_id' => $hashtag->id, 'user_id' => Auth::id()];
+            }
+            $image->hashtags()->sync($data);
+        }
+
+        if ($request->has('categories')) {
+            $data = [];
+            foreach ($request->categories as $categoryName) {
+                $slug = Str::slug($categoryName, '_');
+
+                $category = Category::firstOrCreate(
+                    ['slug' => $slug],
+                    ['name' => $categoryName]
+                );
+                $data[] = ['category_id' => $category->id, 'user_id' => Auth::id()];
+            }
+            $image->categories()->sync($data);
+        }
 
         return response($image, 201);
     }
