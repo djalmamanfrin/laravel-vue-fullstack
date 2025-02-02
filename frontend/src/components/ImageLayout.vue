@@ -1,31 +1,25 @@
 <script setup>
-import {onMounted, ref, watch} from "vue";
-import axiosClient from "../axios.js";
+import {computed, onMounted, watch} from "vue";
+import useCategoryStore from "../store/category.js";
+import useImageStore from "../store/image.js";
+
+const emit = defineEmits(['selected-image']);
 
 const props = defineProps({
   categoryId: Number,
 });
-
-const images = ref([])
-const fetchImages = async (newCategoryId) => {
-    await axiosClient.get(`/api/categories/${newCategoryId}/images`)
-        .then(response => {
-          images.value = response.data;
-        })
-        .catch(error => {
-          // console.log(error.response.data)
-          // errors.value = error.response.data.errors;
-          console.log('Error: ' + error)
-        })
+const imageStore = useImageStore();
+const selectImage = (image) => {
+  imageStore.setSelectedImage(image);
+  emit('selected-image')
 };
 
-watch(() => props.categoryId, (newCategoryId) => {
-  fetchImages(newCategoryId);
-});
+const categoryStore = useCategoryStore()
+const images = computed(() => categoryStore.images)
+const fetchImages = () => { categoryStore.imagesBy(props.categoryId) }
 
-onMounted(() => {
-  fetchImages(props.categoryId);
-})
+watch(() => props.categoryId, fetchImages);
+onMounted(fetchImages);
 </script>
 
 <template>
@@ -36,18 +30,10 @@ onMounted(() => {
           {{ image.created_at_formatted }}
         </time>
       </div>
-      <div class="group relative">
-<!--        <h3 class="mt-3 text-lg/6 font-semibold text-gray-900 group-hover:text-gray-600">-->
-<!--          <a :href="image.href">-->
-<!--            <span class="absolute inset-0" />-->
-<!--            {{ image.title }}-->
-<!--          </a>-->
-<!--        </h3>-->
-        <p class="mt-5 line-clamp-3 text-sm/6 text-gray-600">{{ image.description }}</p>
-      </div>
+      <p class="mt-5 line-clamp-3 text-sm/6 text-gray-600">{{ image.description }}</p>
       <div class="relative mt-8 flex items-center gap-x-4">
-        <img :src="image.url" alt=""
-             class="rounded-lg bg-white object-cover group-hover:opacity-75 max-sm:h-16 sm:aspect-[3/2] lg:aspect-[4/3]"/>
+        <img :src="image.url" alt="" @click="selectImage(image)"
+             class="rounded-lg cursor-pointer bg-white object-cover group-hover:opacity-75 max-sm:h-16 sm:aspect-[3/2] lg:aspect-[4/3]"/>
       </div>
     </article>
   </div>

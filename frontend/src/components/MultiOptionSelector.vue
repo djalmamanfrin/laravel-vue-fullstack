@@ -1,8 +1,12 @@
 <script setup>
-import {ref, defineProps, defineEmits, watch} from 'vue';
+import {ref, defineProps, defineEmits} from 'vue';
 
 const props = defineProps({
   initialOptions: {
+    type: Array,
+    required: true,
+  },
+  selectedOptions: {
     type: Array,
     required: true,
   }
@@ -10,47 +14,47 @@ const props = defineProps({
 
 const emit = defineEmits(['add-option', 'remove-option']);
 
-const newOption = ref('');
-const isDropdownVisible = ref(false);
-const filteredOptions = ref(props.initialOptions);
-const selectedOptions = ref([]);
+const newOption = ref('')
+const isDropdownVisible = ref(false)
+const filteredOptions = ref(null)
 
 const filterNewOption = (event) => {
+  filteredOptions.value = props.initialOptions
+  isDropdownVisible.value = true;
+
   if (event.key === 'Enter') {
-    filteredOptions.value = props.initialOptions
     return;
   }
 
   let value = event.target.value;
   if (value.length >= 2) {
     filteredOptions.value = props.initialOptions.filter(option =>
-        option.toLowerCase().includes(value.toLowerCase())
+        option.slug.toLowerCase().includes(value.toLowerCase())
     );
-    isDropdownVisible.value = true;
   }
 }
 
 const addOption = () => {
   document.querySelector('input[name="multi-select-input"]').blur();
-  const option = newOption.value.trim();
-  if (option && !selectedOptions.value.includes(option)) {
+  const option = {
+    id: null,
+    slug: newOption.value.toLowerCase(),
+    name: newOption.value.charAt(0).toUpperCase() + newOption.value.slice(1),
+  }
+  let index = props.selectedOptions.findIndex(item => item.slug === option.slug)
+  if (option && index === -1) {
     emit('add-option', option);
-    selectedOptions.value.push(option);
     newOption.value = '';
   }
 }
 
 const addSelectedOption = (option) => {
-  const index = selectedOptions.value.indexOf(option);
+  let index = props.selectedOptions.findIndex(item => item.id === option.id)
   if (index === -1) {
-    selectedOptions.value.push(option);
+    emit('add-option', option);
   } else {
-    selectedOptions.value = selectedOptions.value.filter((item) => item !== option);
+    emit('remove-option', option);
   }
-}
-
-const removeOption = (option) => {
-  emit('remove-option', option);
 }
 </script>
 
@@ -59,11 +63,11 @@ const removeOption = (option) => {
     <div class="m-2">
       <div class="flex flex-wrap gap-2">
         <span
-            v-for="(option, index) in selectedOptions"
-            :key="index"
+            v-for="option in props.selectedOptions"
+            :key="option.slug"
             class="bg-blue-100 text-blue-600 py-1 px-3 rounded-full flex items-center"
         >
-          {{ option }}
+          {{ option.name }}
         </span>
       </div>
     </div>
@@ -72,7 +76,7 @@ const removeOption = (option) => {
           v-model="newOption"
           @keyup.enter="addOption"
           @keyup="filterNewOption"
-          @focus="isDropdownVisible = true"
+          @focus="filterNewOption"
           type="text"
           name="multi-select-input"
           class="w-full border p-2 rounded-lg pl-4 pr-10"
@@ -89,13 +93,13 @@ const removeOption = (option) => {
 
         <template v-else>
           <li
-              v-for="(option, index) in filteredOptions"
-              :key="index"
+              v-for="option in filteredOptions"
+              :key="option.slug"
               class="p-2 cursor-pointer hover:bg-gray-200"
-              :class="{'bg-gray-200': selectedOptions.includes(option)}"
+              :class="{'bg-gray-200': selectedOptions.find(item => item.id === option.id)}"
               @click="addSelectedOption(option)"
           >
-            {{ option }}
+            {{ option.name }}
           </li>
         </template>
       </ul>
