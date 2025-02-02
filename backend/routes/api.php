@@ -13,8 +13,10 @@ Route::middleware(['auth:sanctum'])
 
         Route::apiResource('/image', ImageController::class)
             ->only(['index', 'store', 'destroy']);
-        Route::get('/categories/{categoryId}/images', [CategoryController::class, 'images']);
+        Route::get('/image/{imageId}', [ImageController::class, 'get']);
+        Route::patch('/image/{imageId}', [ImageController::class, 'update']);
 
         Route::apiResource('/category', CategoryController::class)
             ->only(['index', 'destroy']);
+        Route::get('/categories/{categoryId}/images', [CategoryController::class, 'images']);
     });
