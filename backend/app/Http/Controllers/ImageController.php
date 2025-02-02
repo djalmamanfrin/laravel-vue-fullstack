@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Image;
 use App\Models\Hashtag;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -23,7 +24,9 @@ class ImageController extends Controller
                 return [
                     'id' => $image->id,
                     'url' => url(Storage::url($image->path)),
-                    'label' => $image->label,
+                    'description' => $image->description,
+                    'created_at' => $image->created_at,
+                    'created_at_formatted' => Carbon::parse($image->created_at)->format('M d, Y'),
                 ];
             });
     }
@@ -62,8 +65,8 @@ class ImageController extends Controller
             $image->hashtags()->sync($data);
         }
 
+        $data = [];
         if ($request->has('categories')) {
-            $data = [];
             foreach ($request->categories as $categoryName) {
                 $slug = Str::slug($categoryName, '_');
 
@@ -73,8 +76,14 @@ class ImageController extends Controller
                 );
                 $data[] = ['category_id' => $category->id, 'user_id' => Auth::id()];
             }
-            $image->categories()->sync($data);
+        } else {
+            $category = Category::firstOrCreate(
+                ['slug' => 'others'],
+                ['name' => 'Others']
+            );
+            $data[] = ['category_id' => $category->id, 'user_id' => Auth::id()];
         }
+        $image->categories()->sync($data);
 
         return response($image, 201);
     }
