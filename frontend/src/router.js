@@ -3,8 +3,8 @@ import DefaultLayout from "./components/DefaultLayout.vue";
 import Signup from "./pages/Signup.vue";
 import Login from "./pages/Login.vue";
 import Home from "./pages/Home.vue";
-import MyImages from "./pages/MyImages.vue";
 import NotFound from "./pages/NotFound.vue";
+import BoardView from "./pages/BoardView.vue";
 import useUserStore from "./store/user.js";
 
 const routes = [
@@ -14,6 +14,7 @@ const routes = [
     children: [
       {path: '/', name: 'Home', component: Home},
       {path: '/my-images', name: 'MyImages', component: MyImages},
+      {path: '/board/:id', name: 'Board', component: BoardView},
     ],
     beforeEnter: async (to, from, next) => {
       try {
