@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('image_category', function (Blueprint $table) {
+        Schema::create('board_members', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->nullable()->constrained('users');
-            $table->foreignId('image_id')->nullable()->constrained('images');
-            $table->foreignId('category_id')->nullable()->constrained('categories');
-            $table->timestamp('created_at')->useCurrent();
+            $table->foreignId('board_id')->constrained('boards');
+            $table->foreignId('user_id')->constrained('users');
+            $table->foreignId('status_id')->constrained('statuses');
+            $table->timestamp('added_at')->useCurrent();
             $table->timestamp('updated_at')->nullable()->useCurrentOnUpdate();
             $table->softDeletes();
         });
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('image_category');
+        Schema::dropIfExists('board_members');
     }
 };

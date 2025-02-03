@@ -3,17 +3,24 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Routing\UrlGenerator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class Image extends Model
 {
-    protected $fillable = ['path', 'slugs', 'description'];
+    protected $fillable = ['collection_id', 'path', 'slugs', 'description'];
 
-    public function categories(): BelongsToMany
+    public function getPathAttribute($value): UrlGenerator
     {
-        return $this->belongsToMany(Category::class, 'image_category')
-            ->where('user_id', Auth::id());
+        return url(Storage::url($value));
+    }
+
+    public function collection(): BelongsTo
+    {
+        return $this->belongsTo(Collection::class);
     }
 
     public function hashtags(): BelongsToMany
