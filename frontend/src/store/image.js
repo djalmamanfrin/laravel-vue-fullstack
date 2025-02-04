@@ -8,12 +8,31 @@ const useImageStore = defineStore('image', {
   }),
   actions: {
     setSelectedImage(image) {
-      this.selectedImage = image;
+      this.selectedImage = image
+    },
+    all() {
+      return axiosClient.get(`/api/image/`)
+        .then(({data}) => {
+          this.images = data
+        })
     },
     get(imageId) {
       return axiosClient.get(`/api/image/${imageId}`)
         .then(({data}) => {
-          this.selectedImage = data;
+          this.selectedImage = data
+        })
+    },
+    upload(formData) {
+      return axiosClient.post('/api/image/', formData)
+        .then(({data}) => {
+          this.selectedImage = data
+        })
+    },
+    update(imageId, fields) {
+      return axiosClient.patch('/api/image/' + imageId, fields)
+        .then(({data}) => {
+          this.selectedImage = data
+          this.images = this.all()
         })
     },
     delete(imageId) {
