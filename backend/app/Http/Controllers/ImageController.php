@@ -2,17 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
 use App\Models\Image;
 use App\Models\Hashtag;
-use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class ImageController extends Controller
 {
@@ -21,29 +18,14 @@ class ImageController extends Controller
      */
     public function index(): JsonResponse
     {
-        $images = Image::latest()
-            ->get()
-            ->map(function ($image) {
-                return [
-                    'id' => $image->id,
-                    'url' => url(Storage::url($image->path)),
-                    'description' => $image->description,
-                    'created_at' => $image->created_at,
-                    'created_at_formatted' => Carbon::parse($image->created_at)->format('M d, Y'),
-                ];
-            });
+        $images = Image::latest()->get();
         return response()->json($images);
     }
 
     public function get(int $imageId): JsonResponse
     {
         $image = Image::findOrFail($imageId);
-        return response()->json([
-            'id' => $image->id,
-            'url' => url(Storage::url($image->path)),
-            'description' => $image->description,
-            'categories' => $image->categories
-        ]);
+        return response()->json($image);
     }
 
     public function store(Request $request): JsonResponse
@@ -53,16 +35,15 @@ class ImageController extends Controller
         ]);
 
         $path = $request->file('image')->store('images', 'public');
-        return response()->json(['path' => $path], Response::HTTP_CREATED);
+        return response()->json(['title' => 'Not set', 'path' => $path], Response::HTTP_CREATED);
     }
 
     public function update(Request $request, int $imageId): JsonResponse
     {
         $request->validate([
             'path' => ['nullable', 'string'],
-            'categories' => ['nullable', 'array'],
-            'categories.*' => ['string'],
-            'description' => ['nullable', 'string', 'max:500'],
+            'collection_id' => ['nullable', 'integer',  'unique:collection,id'],
+            'title' => ['required', 'string', 'max:60'],
         ]);
 
         try {
@@ -71,9 +52,7 @@ class ImageController extends Controller
                 ['id' => $imageId],
                 $request->all(),
             );
-            logger()->info('before if description');
             if ($request->filled('description')) {
-                logger()->info('inside if description');
                 $image->fill(['patch' => $request->description]);
                 preg_match_all('/#(\w+)/', $request->description, $matches);
                 $hashtags = $matches[1] ?? [];
@@ -87,23 +66,6 @@ class ImageController extends Controller
                     $data[] = ['hashtag_id' => $hashtag->id, 'user_id' => Auth::id()];
                 }
                 $image->hashtags()->sync($data);
-            }
-
-            $data = [];
-            logger()->info('before if categories');
-            logger()->info('categories: ' . json_encode($request->all()));
-            if ($request->has('categories')) {
-                logger()->info('inside if categories');
-                foreach ($request->categories as $categoryName) {
-                    $slug = Str::slug($categoryName, '_');
-
-                    $category = Category::firstOrCreate(
-                        ['slug' => $slug],
-                        ['name' => $categoryName]
-                    );
-                    $data[] = ['category_id' => $category->id, 'user_id' => Auth::id()];
-                }
-                $image->categories()->sync($data);
             }
             DB::commit();
             return response()->json($image);
@@ -127,8 +89,6 @@ class ImageController extends Controller
     {
         try {
             DB::beginTransaction();
-            $image->categories()->detach();
-            $image->categories()->where('user_id', Auth::id())->delete();
             $image->hashtags()->detach();
             $image->hashtags()->where('user_id', Auth::id())->delete();
             $image->delete();

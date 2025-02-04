@@ -2,18 +2,24 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Routing\UrlGenerator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class Image extends Model
 {
-    protected $fillable = ['collection_id', 'path', 'slugs', 'description'];
+    protected $fillable = ['collection_id', 'title', 'path', 'slugs', 'description'];
+    protected $appends = ['created_at_formatted'];
 
-    public function getPathAttribute($value): UrlGenerator
+    public function getCreatedAtFormattedAttribute(): string
+    {
+        return Carbon::parse($this->created_at)->format('M d, Y');
+    }
+
+    public function getPathAttribute($value)
     {
         return url(Storage::url($value));
     }
