@@ -25,11 +25,6 @@ const user = computed(() => userStore.user)
 const isDrawerOpened = ref(false)
 const isModalOpened = ref(false)
 
-const navigation = [
-  { name: 'Upload', to: {name: 'Home'}},
-  { name: 'My Feed', to: {name: 'MyImages'}},
-]
-
 const image = ref(null)
 const imagePreview = ref(imageStore.selectedImage?.path ?? null)
 const title = ref(imageStore.selectedImage?.title ?? '')
@@ -95,7 +90,7 @@ const submit = () => {
 
 <template>
   <div class="min-h-full">
-    <MyModal :is-opened="isModalOpened" @close-modal="isModalOpened = false">
+    <MyModal size="max-w-3xl" :is-opened="isModalOpened" @close-modal="isModalOpened = false">
       <form @submit.prevent="submit">
         <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
           <div class="sm:flex sm:items-center sm:space-x-4">
@@ -183,18 +178,6 @@ const submit = () => {
             <div class="shrink-0">
               <img class="size-8" src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=500" alt="Your Company" />
             </div>
-            <div class="hidden md:block">
-              <div class="ml-10 flex items-baseline space-x-4">
-                <RouterLink v-for="item in navigation"
-                   :to="item.to"
-                   :href="item.href"
-                   :class="[
-                       $route.name === item.to.name ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white', 'rounded-md px-3 py-2 text-sm font-medium']"
-                            :aria-current="$route.name === item.to.name ? 'page' : undefined">
-                  {{ item.name }}
-                </RouterLink>
-              </div>
-            </div>
           </div>
           <div class="hidden md:block">
             <div class="ml-4 flex items-center md:ml-6 gap-8">
@@ -241,9 +224,6 @@ const submit = () => {
       </div>
 
       <DisclosurePanel class="md:hidden">
-        <div class="space-y-1 px-2 pt-2 pb-3 sm:px-3">
-          <DisclosureButton v-for="item in navigation" :key="item.name" as="a" :href="item.href" :class="[item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white', 'block rounded-md px-3 py-2 text-base font-medium']" :aria-current="item.current ? 'page' : undefined">{{ item.name }}</DisclosureButton>
-        </div>
         <div class="border-t border-gray-700 pt-4 pb-3">
           <div class="flex items-center px-5">
             <div class="shrink-0">

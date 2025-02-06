@@ -13,7 +13,6 @@ const routes = [
     component: DefaultLayout,
     children: [
       {path: '/', name: 'Home', component: Home},
-      {path: '/my-images', name: 'MyImages', component: MyImages},
       {path: '/board/:id', name: 'Board', component: BoardView},
     ],
     beforeEnter: async (to, from, next) => {

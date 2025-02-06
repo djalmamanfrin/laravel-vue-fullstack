@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('path', 2000);
             $table->foreignId('collection_id')->nullable()->constrained('collections');
+            $table->string('title', 60)->nullable();
             $table->text('description')->nullable();
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->nullable()->useCurrentOnUpdate();

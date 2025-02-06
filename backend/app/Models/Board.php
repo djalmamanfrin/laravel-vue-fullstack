@@ -16,6 +16,7 @@ class Board extends Model
     protected $fillable = [
         'name',
         'owner_id',
+        'board_id',
     ];
 
     protected $appends = ['created_at_formatted'];

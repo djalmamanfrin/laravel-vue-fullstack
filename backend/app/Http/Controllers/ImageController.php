@@ -40,17 +40,17 @@ class ImageController extends Controller
 
     public function update(Request $request, int $imageId): JsonResponse
     {
-        $request->validate([
+        $validated = $request->validate([
             'path' => ['nullable', 'string'],
-            'collection_id' => ['nullable', 'integer',  'unique:collection,id'],
-            'title' => ['required', 'string', 'max:60'],
+            'collection_id' => ['nullable', 'integer',  'exists:collections,id'],
+            'title' => ['nullable', 'string', 'max:60'],
         ]);
 
         try {
             DB::beginTransaction();
             $image = Image::updateOrcreate(
                 ['id' => $imageId],
-                $request->all(),
+                $validated,
             );
             if ($request->filled('description')) {
                 $image->fill(['patch' => $request->description]);
