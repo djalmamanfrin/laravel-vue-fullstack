@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('slug');
             $table->string('name');
+            $table->integer('order');
             $table->foreignId('board_id')->constrained('boards');
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->nullable()->useCurrentOnUpdate();
