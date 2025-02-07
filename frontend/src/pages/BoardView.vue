@@ -46,9 +46,11 @@ const getNewCollectionsToPersist = () => {
 const submit = () => {
   let newCollection = getNewCollectionsToPersist()
   if (newCollection.length === 0) {
-    errors.value.collections = []
+    errors.value.collections = ['Collection not found! Type a new one and press Enter to save']
+    return;
   }
 
+  errors.value.collections = []
   newCollection
     .map(collection => {
       boardStore.createCollection({name: collection.name, order: collection.order})
@@ -70,9 +72,9 @@ watch(() => imageStore.images, () => {
   boardStore.get(boardId)
 })
 
-// watch(() => isCollectionModalOpened.value, () => {
-//   boardStore.get(boardId)
-// })
+watch(() => isCollectionModalOpened.value, () => {
+  boardStore.get(boardId)
+})
 
 onBeforeMount(() => {
   boardStore.get(boardId)
@@ -80,7 +82,6 @@ onBeforeMount(() => {
 })
 
 const onColumnDrag = (event, collectionId) => {
-  console.log('onColumnDrag', event, collectionId)
   event.dataTransfer.dropEffect = 'move'
   event.dataTransfer.effectAllowed = 'move'
   event.dataTransfer.setData('dragCollectionId', collectionId)
@@ -92,6 +93,7 @@ const onImageDrag = (event, imageId) => {
   event.dataTransfer.effectAllowed = 'move'
   event.dataTransfer.setData('imageId', imageId)
 };
+
 const onImageDrop = (event, dropCollectionId) => {
   let imageId = event.dataTransfer.getData('imageId')
   if (imageId) {
@@ -110,11 +112,6 @@ const getColumnClass = (index) => {
     ? 'rounded-[calc(var(--radius-lg)+1px)] lg:rounded-r-[calc(2rem+1px)]'
     : 'rounded-[1rem]'
 }
-
-const gridClass = computed(() => {
-  const cols = board.value.collections.length + 1;
-  return `mt-8 grid gap-4 lg:grid-cols-${cols} h-screen`;
-});
 </script>
 
 <template>
@@ -172,13 +169,13 @@ const gridClass = computed(() => {
         </div>
       </div>
     </div>
-    <div v-if="getNewCollectionsToPersist().length > 0" class="bg-gray-50 gap-4 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-      <MyButton @click="submit" name="save" />
+    <div class="bg-gray-50 gap-4 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+      <MyButton v-if="getNewCollectionsToPersist().length > 0" @click="submit" name="save" />
 
       <button type="button"
               @click="isCollectionModalOpened = false"
               class="mt-3 inline-flex w-full justify-center cursor-pointer rounded-md bg-white px-8 py-3 text-sm font-semibold text-gray-900 ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-gray-50 sm:mt-0 sm:w-auto">
-        Cancel
+        Back
       </button>
     </div>
   </MyModal>
@@ -195,17 +192,13 @@ const gridClass = computed(() => {
             </h2>
           </div>
           <div class="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
-            <div class="mt-2 flex items-center text-sm text-gray-500 gap-1">
+            <div v-if="board.owner" class="mt-2 flex items-center text-sm text-gray-500 gap-1">
               <UserCircleIcon class="block size-6" aria-hidden="true" />
-              <span>Owner</span> <b>{{ board.name }}</b>
-            </div>
-            <div class="mt-2 flex items-center text-sm text-gray-500 gap-1">
-              <UserGroupIcon class="block size-6" aria-hidden="true" />
-              <b>{{ 3 }}</b> <span>Collaborators</span>
+              <span>Owner</span> <b>{{ board.owner.name }}</b>
             </div>
             <div class="mt-2 flex items-center text-sm text-gray-500 gap-1">
               <PhotoIcon class="block size-7" aria-hidden="true" />
-              <b>{{ 3 }} images</b> in progress
+              <b>{{ board.images_counter }} images</b> being worked on
             </div>
             <div class="mt-2 flex items-center text-sm text-gray-500 gap-1">
               <CalendarDaysIcon class="block size-6" aria-hidden="true" />
@@ -221,7 +214,8 @@ const gridClass = computed(() => {
       </div>
 
       <!-- Board Layout -->
-      <div :class="gridClass">
+      <div class="`grid lg:grid-cols-1 lg:grid-cols-2 lg:grid-cols-3 lg:grid-cols-4 lg:grid-cols-5 lg:grid-cols-6"></div>
+      <div :class="`mt-8 grid gap-4 lg:grid-cols-${board.collections.length + 1} h-screen`">
       <!-- My local images - column fixed -->
         <div class="relative lg:row-span-2 flex flex-col h-full">
           <div class="absolute inset-px rounded-lg bg-white lg:rounded-l-[2rem]" />
@@ -294,12 +288,17 @@ const gridClass = computed(() => {
             <div class="relative px-3 pt-4">
               <p class="text-lg font-medium tracking-tight text-gray-950 text-center">{{ collection.name }}</p>
             </div>
-            <div class="relative flex flex-col flex-1 overflow-auto rounded-[calc(var(--radius-lg)+1px)]">
+            <div
+                @drop="onImageDrop($event, collection.id)"
+                @dragenter.prevent
+                @dragover.prevent
+                class="relative flex flex-col flex-1 overflow-auto rounded-[calc(var(--radius-lg)+1px)]"
+            >
               <div
                   v-for="image in collection.images"
                   :key="image.id"
                   draggable="true"
-                  @dragstart="onImageDrag($event, image.id)"
+                  @dragstart.stop="onImageDrag($event, image.id)"
                   class="flex items-start justify-center px-4 pt-4"
               >
                 <div class="w-full flex flex-col items-start justify-start flex-grow">
@@ -309,7 +308,6 @@ const gridClass = computed(() => {
             </div>
           </div>
         </template>
-
       </div>
     </div>
   </div>

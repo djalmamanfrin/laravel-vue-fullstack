@@ -166,7 +166,7 @@ const submit = () => {
           <button type="button"
                   @click="handleCloseImage"
                   class="mt-3 inline-flex w-full justify-center cursor-pointer rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-gray-50 sm:mt-0 sm:w-auto">
-            Cancelar
+            Back
           </button>
         </div>
       </form>

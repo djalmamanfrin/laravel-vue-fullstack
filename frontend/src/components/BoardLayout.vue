@@ -14,13 +14,28 @@ defineProps({
           :to="{ name: 'Board', params: { id: board.id } }"
           class="relative mt-1 flex items-center gap-x-4 group w-full"
       >
-        <img
-            src="https://letsenhance.io/static/73136da51c245e80edc6ccfe44888a99/1015f/MainBefore.jpg"
-            alt=""
-            class="rounded-lg cursor-pointer bg-white object-cover w-full group-hover:opacity-75 max-sm:h-16 sm:aspect-[3/2] lg:aspect-[4/3] group-hover:brightness-50"
-        />
+        <div class="grid grid-cols-2 grid-rows-2 w-full group-hover:opacity-75 group-hover:brightness-50">
+          <img
+              v-if="board.images?.length >= 3"
+              :src="board.images[0].path"
+              alt=""
+              class="col-span-2 row-span-1 rounded-t-lg object-cover w-full h-20 sm:h-28 lg:h-36"
+          />
+          <img
+              v-if="board.images?.length >= 3"
+              :src="board.images[1].path"
+              alt=""
+              class="col-span-1 row-span-1 rounded-bl-lg object-cover w-full h-20 sm:h-28 lg:h-36"
+          />
+          <img
+              v-if="board.images?.length >= 3"
+              :src="board.images[2].path"
+              alt=""
+              class="col-span-1 row-span-1 rounded-br-lg object-cover w-full h-20 sm:h-28 lg:h-36"
+          />
+        </div>
 
-        <div class="absolute inset-0 flex flex-col justify-center items-center group-hover:flex group-hover:block w-full text-center break-words p-4">
+        <div class="absolute inset-0 flex flex-col justify-center items-center group-hover:flex w-full text-center break-words p-4">
           <h3 class="text-2xl font-bold text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             {{ board.name }}
           </h3>
@@ -36,6 +51,3 @@ defineProps({
     </article>
   </div>
 </template>
-
-<style scoped>
-</style>

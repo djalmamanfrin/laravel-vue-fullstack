@@ -1,33 +1,52 @@
 <script setup>
-defineProps({
+import { ref, onMounted } from 'vue'
+
+const props = defineProps({
   image: {
     type: Object,
     required: true,
   },
 })
+
+const container = ref(null)
+const fontSize = ref('1rem')
+const timeSize = ref('0.50rem')
+
+onMounted(() => {
+  const resizeObserver = new ResizeObserver(entries => {
+    for (const entry of entries) {
+      const width = entry.contentRect.width
+
+      fontSize.value = `${Math.max(12, width / 10)}px`
+      timeSize.value = `${Math.max(10, width / 15)}px`
+    }
+  })
+
+  if (container.value) {
+    resizeObserver.observe(container.value)
+  }
+})
 </script>
 
 <template>
-  <div class="relative p-4 flex items-center gap-x-4 group w-full">
+  <div ref="container" class="relative group w-full max-w-[280px] min-w-[160px] aspect-square">
     <img
         :src="image.path"
         alt=""
-        class="w-full h-auto rounded-lg cursor-pointer bg-white object-cover group-hover:opacity-75 aspect-[4/3] sm:aspect-[3/2] md:aspect-[16/9] lg:aspect-[4/3] group-hover:brightness-50"
+        class="w-full h-full rounded-lg cursor-pointer bg-white object-cover group-hover:opacity-75 group-hover:brightness-50"
     />
-
-    <div
-        class="absolute inset-0 flex flex-col justify-center items-center group-hover:flex group-hover:block w-full text-center break-words p-4"
-    >
+    <div class="absolute inset-0 flex flex-col justify-center items-center w-full text-center p-2">
       <h3
-          class="text-2xl p-1 sm:text-sm md:text-base md:mt-2 font-bold text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          class="font-bold text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          :style="{ fontSize }"
       >
         {{ image.title }}
       </h3>
     </div>
-
     <time
         :datetime="image.created_at"
-        class="absolute text-sm md:text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        class="absolute top-2 right-2 text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        :style="{ fontSize: timeSize }"
     >
       {{ image.created_at_formatted }}
     </time>
