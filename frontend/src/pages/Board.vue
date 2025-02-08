@@ -1,25 +1,27 @@
 <script setup>
 import {useRoute} from 'vue-router';
 import useBoardStore from "../store/board.js";
-import {computed, onBeforeMount, ref, watch} from "vue";
-import { CalendarDaysIcon, UserCircleIcon, UserGroupIcon, PhotoIcon, PlusIcon, TrashIcon, ChevronLeftIcon } from '@heroicons/vue/24/outline'
+import {computed, onBeforeMount, onMounted, ref, watch} from "vue";
+import { CalendarDaysIcon, UserCircleIcon, ViewColumnsIcon, PhotoIcon, PlusIcon, PencilIcon, BellIcon, BellAlertIcon, TrashIcon, ChevronLeftIcon } from '@heroicons/vue/24/outline'
 import MyButton from "../components/atoms/MyButton.vue";
 import useImageStore from "../store/image.js";
 import MyImage from "../components/atoms/MyImage.vue";
 import MyModal from "../components/atoms/MyModal.vue";
-import {ExclamationTriangleIcon} from "@heroicons/vue/24/outline/index.js";
-import {DialogTitle} from "@headlessui/vue";
+import {ExclamationTriangleIcon, XMarkIcon} from "@heroicons/vue/24/outline/index.js";
+import {Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot} from "@headlessui/vue";
 
 const route = useRoute();
 const boardId = route.params.id;
 
-const errors = ref({
+const info = ref({
   collections: [],
 })
 
+const isDrawerOpened = ref(false)
 const isCollectionModalOpened = ref(false)
 const boardStore = useBoardStore()
 const board = computed(() => boardStore.board)
+const recentChanges = computed(() => boardStore.recentChanges)
 
 const imageStore = useImageStore();
 const images = computed(() => imageStore.images)
@@ -33,7 +35,10 @@ const removeBoardCollection = (item) => {
 }
 
 const createCollection = () => {
-  errors.value.collections = ['Collection added! Press Enter to persist']
+  if (combineCollections.value.length >= 5) {
+    info.value.collections = ['The limit of 6 collections has been reached.']
+  }
+  info.value.collections = ['Collection added! Press Save to persist']
   let capitalizeName = inputCollection.value.replace(/\b\w/g, char => char.toUpperCase())
   combineCollections.value.push({name: capitalizeName, slug: crypto.randomUUID(), order: board.value.collections.length + 1})
   inputCollection.value = null
@@ -46,11 +51,11 @@ const getNewCollectionsToPersist = () => {
 const submit = () => {
   let newCollection = getNewCollectionsToPersist()
   if (newCollection.length === 0) {
-    errors.value.collections = ['Collection not found! Type a new one and press Enter to save']
+    info.value.collections = ['Collection not found! Type a new one and press Enter to save']
     return;
   }
 
-  errors.value.collections = []
+  info.value.collections = []
   newCollection
     .map(collection => {
       boardStore.createCollection({name: collection.name, order: collection.order})
@@ -59,11 +64,23 @@ const submit = () => {
             isCollectionModalOpened.value = false;
           })
           .catch(error => {
-            console.log(error.data)
-            errors.value.collections = error.data
+            info.value.collections = [error.response.data.message]
           })
     })
 }
+const editableName = ref(null)
+const editing = ref(false)
+
+const saveName = () => {
+  if (!editing.value) return;
+  editing.value = false;
+  boardStore.update({name: editableName.value})
+};
+
+watch(() => editing.value, () => {
+  editableName.value = board.value.name;
+});
+
 watch(() => boardStore.board, (newBoard) => {
   combineCollections.value = newBoard.collections
 })
@@ -79,6 +96,10 @@ watch(() => isCollectionModalOpened.value, () => {
 onBeforeMount(() => {
   boardStore.get(boardId)
   imageStore.all()
+})
+
+onMounted(() => {
+  boardStore.fetchRecentChanges(boardId)
 })
 
 const onColumnDrag = (event, collectionId) => {
@@ -129,6 +150,11 @@ const getColumnClass = (index) => {
       <div class="sm:flex sm:items-start">
         <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
           <div class="mb-4">
+            <p
+                class="mb-2 text-sm text-center font-medium bg-yellow-100 w-full mb-1 p-2"
+            >
+              <b>{{ board.collections.length }} / 5 </b> available collection
+            </p>
             <label for="collectionDescription" class="block text-sm font-medium text-gray-700">
               Type a collection name to add:
             </label>
@@ -163,7 +189,7 @@ const getColumnClass = (index) => {
                 </li>
             </ul>
             <p class="text-sm mt-1 text-center text-yellow-600">
-              {{ errors.collections ? errors.collections[0] : '' }}
+              {{ info.collections ? info.collections[0] : '' }}
             </p>
           </div>
         </div>
@@ -184,12 +210,30 @@ const getColumnClass = (index) => {
       <div class="lg:flex lg:items-center lg:justify-between">
         <div class="min-w-0 flex-1">
           <div class="flex items-center">
-            <button onclick="window.history.back()" class="text-gray-500 border p-1 border-gray-500 hover:border-gray-600 rounded hover:text-gray-700 mr-3">
-              <ChevronLeftIcon class="block size-6 cursor-pointer" aria-hidden="true"/>
+            <button onclick="window.history.back()" class="">
+              <ChevronLeftIcon class="block size-8 cursor-pointer font-semibold" aria-hidden="true"/>
             </button>
-            <h2 class="text-2xl/7 font-bold text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
-              {{ board.name }}
-            </h2>
+            <div class="relative group flex items-center">
+              <input
+                  v-if="editing"
+                  v-model="editableName"
+                  @blur="saveName"
+                  @keyup.enter="saveName"
+                  class="text-2xl/7 font-bold text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight border border-gray-300 rounded px-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  autofocus
+              />
+              <h2
+                  v-else
+                  class="text-2xl/7 font-bold text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight cursor-pointer"
+                  @click="editing = true"
+              >
+                {{ board.name }}
+              </h2>
+              <PencilIcon
+                  class="size-5 text-gray-500 cursor-pointer ml-2 opacity-70 group-hover:opacity-100 transition-opacity"
+                  @click="editing = true"
+              />
+            </div>
           </div>
           <div class="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
             <div v-if="board.owner" class="mt-2 flex items-center text-sm text-gray-500 gap-1">
@@ -201,12 +245,20 @@ const getColumnClass = (index) => {
               <b>{{ board.images_counter }} images</b> being worked on
             </div>
             <div class="mt-2 flex items-center text-sm text-gray-500 gap-1">
+              <ViewColumnsIcon class="block size-7" aria-hidden="true" />
+              <b>{{ board.collections.length }} / 5 </b> available collection
+            </div>
+            <div class="mt-2 flex items-center text-sm text-gray-500 gap-1">
               <CalendarDaysIcon class="block size-6" aria-hidden="true" />
               <span>Created at</span> <b>{{ board.created_at_formatted }}</b>
             </div>
           </div>
         </div>
         <div class="mt-5 flex lg:mt-0 lg:ml-4">
+          <span @click="isDrawerOpened = true" class="flex items-center cursor-pointer sm:ml-3">
+            <BellAlertIcon v-if="boardStore.unreadChangesCount" class="block text-yellow-500 size-6" aria-hidden="true" />
+            <BellIcon v-else class="block size-6" aria-hidden="true" />
+          </span>
           <span class="sm:ml-3">
             <MyButton @click="isCollectionModalOpened = true" name="collection" :left-icon="PlusIcon" />
           </span>
@@ -214,8 +266,7 @@ const getColumnClass = (index) => {
       </div>
 
       <!-- Board Layout -->
-      <div class="`grid lg:grid-cols-1 lg:grid-cols-2 lg:grid-cols-3 lg:grid-cols-4 lg:grid-cols-5 lg:grid-cols-6"></div>
-      <div :class="`mt-8 grid gap-4 lg:grid-cols-${board.collections.length + 1} h-screen`">
+      <div :class="`mt-8 grid gap-2 lg:grid-cols-6 h-screen`">
       <!-- My local images - column fixed -->
         <div class="relative lg:row-span-2 flex flex-col h-full">
           <div class="absolute inset-px rounded-lg bg-white lg:rounded-l-[2rem]" />
@@ -311,6 +362,49 @@ const getColumnClass = (index) => {
       </div>
     </div>
   </div>
+
+  <TransitionRoot as="template" :show="isDrawerOpened">
+    <Dialog class="relative z-10" @close="isDrawerOpened = false">
+      <TransitionChild as="template" enter="ease-in-out duration-500" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in-out duration-500" leave-from="opacity-100" leave-to="opacity-0">
+        <div class="fixed inset-0 bg-gray-500/75 transition-opacity" />
+      </TransitionChild>
+
+      <div class="fixed inset-0 overflow-hidden">
+        <div class="absolute inset-0 overflow-hidden">
+          <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
+            <TransitionChild as="template" enter="transform transition ease-in-out duration-500 sm:duration-700" enter-from="translate-x-full" enter-to="translate-x-0" leave="transform transition ease-in-out duration-500 sm:duration-700" leave-from="translate-x-0" leave-to="translate-x-full">
+              <DialogPanel class="pointer-events-auto relative w-screen max-w-md">
+                <TransitionChild as="template" enter="ease-in-out duration-500" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in-out duration-500" leave-from="opacity-100" leave-to="opacity-0">
+                  <div class="absolute top-0 left-0 -ml-8 flex pt-4 pr-2 sm:-ml-10 sm:pr-4">
+                    <button type="button" class="relative ursor-pointer rounded-md text-gray-300 hover:text-white focus:ring-2 focus:ring-white focus:outline-hidden" @click="isDrawerOpened = false">
+                      <span class="absolute -inset-2.5" />
+                      <span class="sr-only">Close panel</span>
+                      <XMarkIcon class="size-6" aria-hidden="true" />
+                    </button>
+                  </div>
+                </TransitionChild>
+                <div class="flex h-full flex-col overflow-y-scroll bg-white py-6 shadow-xl">
+                  <div class="px-4 sm:px-6">
+                    <DialogTitle class="text-base font-semibold text-gray-900">Recent Board Changes</DialogTitle>
+                  </div>
+
+                  <div class="relative mt-6 flex-1 px-4 sm:px-6 space-y-4">
+                    <div v-for="change in recentChanges" :key="change.id" class="border-b border-gray-200 pb-2">
+                      <div class="flex justify-between text-sm text-gray-600">
+                        <span v-if="change.user" class="font-semibold">{{ change.user.name }}</span>
+                        <span>{{ change.changed_at }}</span>
+                      </div>
+                      <p class="text-gray-800 text-sm mt-1">{{ change.action }}</p>
+                    </div>
+                  </div>
+                </div>
+              </DialogPanel>
+            </TransitionChild>
+          </div>
+        </div>
+      </div>
+    </Dialog>
+  </TransitionRoot>
 </template>
 
 <style scoped>
@@ -320,10 +414,5 @@ const getColumnClass = (index) => {
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
-}
-.lg\:grid-cols-5{
-  @media (width >= 64rem) {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-  }
 }
 </style>

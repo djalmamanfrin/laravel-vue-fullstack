@@ -7,7 +7,8 @@ const useBoardStore = defineStore('board', {
       collections: []
     },
     boards: [],
-    recentChanges: []
+    recentChanges: [],
+    unreadChangesCount: null
   }),
   actions: {
     get(boardId) {
@@ -16,10 +17,16 @@ const useBoardStore = defineStore('board', {
           this.board = data
         })
     },
-    fetchBoards() {
+    all() {
       return axiosClient.get(`/api/board/`)
         .then(({data}) => {
           this.boards = data
+        })
+    },
+    create(fields = {}) {
+      return axiosClient.post(`/api/board/`, fields)
+        .then(({data}) => {
+          this.board = data
         })
     },
     update(fields) {
@@ -52,10 +59,12 @@ const useBoardStore = defineStore('board', {
     },
     fetchRecentChanges(boardId) {
       return axiosClient.get(`/api/board/${boardId}/recent-changes`)
-        .then(({data}) => {
-          this.recentChanges = data
-        })
+        .then(({ data }) => {
+          this.recentChanges = data;
+          this.unreadChangesCount = this.recentChanges.filter(change => change.read_at === null).length;
+        });
     }
+
   }
 })
 

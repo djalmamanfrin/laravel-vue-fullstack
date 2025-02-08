@@ -17,9 +17,8 @@ class CollectionObserver
         $action = "Collection '{$collection->name}' created with order {$collection->order} by " . $loggedInUser->name;
         RecentChange::create([
             'board_id' => $collection->board_id,
-            'user_id' => $loggedInUser->id ?? 1,
+            'user_id' => $loggedInUser->id,
             'action' => $action,
-            'changed_at' => now(),
         ]);
     }
 
@@ -33,12 +32,11 @@ class CollectionObserver
             $oldOrder = $collection->getOriginal('order');
             $newOrder = $collection->order;
 
-            $action = "Collection order changed from {$oldOrder} to {$newOrder} by " . $loggedInUser->name;
+            $action = "Collection {$collection->name} order changed from {$oldOrder} to {$newOrder} by " . $loggedInUser->name;
             RecentChange::create([
                 'board_id' => $collection->board_id,
                 'user_id' => $loggedInUser->id,
                 'action' => $action,
-                'changed_at' => now(),
             ]);
         }
     }
@@ -53,7 +51,6 @@ class CollectionObserver
             'board_id' => $collection->board_id,
             'user_id' => $loggedInUser->id ?? 1,
             'action' => "Collection '{$collection->name}' deleted by " . $loggedInUser->name,
-            'changed_at' => now(),
         ]);
     }
 

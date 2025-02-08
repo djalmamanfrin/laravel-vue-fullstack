@@ -10,10 +10,13 @@ class RecentChange extends Model
 {
     use HasFactory;
 
+    public $timestamps = false;
+
     protected $fillable = [
         'board_id',
         'user_id',
         'action',
+        'read_at',
     ];
 
     public function board(): BelongsTo

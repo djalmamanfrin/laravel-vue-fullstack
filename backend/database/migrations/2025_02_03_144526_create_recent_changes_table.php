@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users');
             $table->string('action');
             $table->timestamp('changed_at')->useCurrent();
+            $table->timestamp('read_at')->nullable();
         });
     }
 

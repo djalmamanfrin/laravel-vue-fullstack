@@ -33,15 +33,14 @@ class ImageObserver
             $action = match (true) {
                 is_null($oldCollection) && !is_null($newCollection) => "Image moved to '{$newCollectionName}' by {$loggedInUser->name}",
                 !is_null($oldCollection) && is_null($newCollection) => "Image rolled back from '{$oldCollectionName}' to My local images by {$loggedInUser->name}",
-                default => "Image moved from '{$oldCollectionName}' to '{$newCollectionName}' by {$loggedInUser->name}",
+                default => "Image {$image->title} moved from '{$oldCollectionName}' to '{$newCollectionName}' by {$loggedInUser->name}",
             };
 
-            $boardId = $newCollection->board_id ?? $oldCollectionName->board_id;
+            $boardId = $newCollection->board_id ?? $oldCollection->board_id;
             RecentChange::create([
                 'board_id' => $boardId,
                 'user_id' => $loggedInUser->id,
                 'action' => $action,
-                'changed_at' => now(),
             ]);
         }
     }

@@ -19,7 +19,6 @@ class BoardObserver
             'board_id' => $board->id,
             'user_id' => $loggedInUser->id,
             'action' => $action,
-            'changed_at' => now(),
         ]);
     }
 
@@ -28,16 +27,16 @@ class BoardObserver
      */
     public function updated(Board $board): void
     {
+        $loggedInUser = Auth::user();
         if ($board->isDirty('name')) {
             $oldName = $board->getOriginal('name');
             $newName = $board->name;
 
             $action = "Board name changed from {$oldName} to {$newName} by " . $loggedInUser->name;
             RecentChange::create([
-                'board_id' => $board->board_id,
+                'board_id' => $board->id,
                 'user_id' => $loggedInUser->id,
                 'action' => $action,
-                'changed_at' => now(),
             ]);
         }
     }

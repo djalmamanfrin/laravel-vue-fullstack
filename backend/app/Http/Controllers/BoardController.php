@@ -12,12 +12,21 @@ use Illuminate\Support\Facades\DB;
 
 class BoardController extends Controller
 {
-
     public function index(): JsonResponse
     {
-        $boards = Board::query()
-            ->where('owner_id', Auth::id())
-            ->get();
+        $boards = Board::where('owner_id', Auth::id())
+            ->get()
+            ->map(function ($board) {
+                $allImages = collect();
+
+                foreach ($board->collections()->get() as $collection) {
+                    $allImages = $allImages->merge($collection->images);
+                }
+
+                $board->images = $allImages->shuffle()->take(3)->values();
+                $board->images_counter = $allImages->count();
+                return $board;
+            });
         return response()->json($boards);
     }
 
@@ -27,15 +36,32 @@ class BoardController extends Controller
             'collections' => function ($query) {
                 $query->orderBy('order');
             },
-            'collections.images'
+            'collections.images',
+            'owner'
         ])->findOrFail($boardId);
 
+        $allImages = collect();
+        foreach ($board->collections as $collection) {
+            $allImages = $allImages->merge($collection->images);
+        }
+        $board->images_counter = $allImages->count();
+
         return response()->json($board);
+    }
+
+    public function store(): JsonResponse
+    {
+        $board = Board::create([
+            'name' => 'Untitled',
+            'owner_id' => Auth::id()
+        ]);
+        return response()->json($board, Response::HTTP_CREATED);
     }
 
     public function update(Request $request, int $boardId): JsonResponse
     {
         $validated = $request->validate([
+            'name' => 'nullable|string|max:60',
             'drag_collection_id' => 'nullable|integer|exists:collections,id',
             'drop_collection_id' => 'nullable|integer|exists:collections,id',
         ]);
@@ -43,17 +69,24 @@ class BoardController extends Controller
         try {
             DB::beginTransaction();
             $board = Board::findOrFail($boardId);
-            $dragCollection = $board->collections()->findOrFail($validated['drag_collection_id']);
-            $dropCollection = $board->collections()->findOrFail($validated['drop_collection_id']);
+            if (!empty($validated['name'])) {
+                $board->forceFill(['name' => $validated['name']]);
+            }
 
-            $tempOrder = $dragCollection->order;
-            $dragCollection->order = $dropCollection->order;
-            $dropCollection->order = $tempOrder;
+            if (!empty($validated['drag_collection_id']) && !empty($validated['drop_collection_id'])) {
+                $dragCollection = $board->collections()->findOrFail($validated['drag_collection_id']);
+                $dropCollection = $board->collections()->findOrFail($validated['drop_collection_id']);
 
-            $dragCollection->save();
-            $dropCollection->save();
+                $tempOrder = $dragCollection->order;
+                $dragCollection->order = $dropCollection->order;
+                $dropCollection->order = $tempOrder;
+
+                $dragCollection->save();
+                $dropCollection->save();
+            }
+
+            $board->save();
             DB::commit();
-
             return response()->json($board);
         } catch (\Throwable $exception) {
             DB::rollBack();
@@ -97,15 +130,30 @@ class BoardController extends Controller
     {
         $board = Board::findOrFail($boardId);
         $collection = $board->collections()->findOrFail($collectionId);
-        $collection->images()->update(['collection_id' => null]);
+
+        foreach ($collection->images as $image) {
+            $image->update(['collection_id' => null]);
+        }
         $collection->delete();
+
+        $collections = $board->collections()->orderBy('order')->get();
+        foreach ($collections as $index => $collection) {
+            $collection->update(['order' => ++$index]);
+        }
+
         return response()->json($board->load('collections'));
     }
+
 
     public function recentChanges(int $boardId): JsonResponse
     {
         $board = Board::findOrFail($boardId);
-        $recentChanges = $board->recentChanges()->get();
+        $recentChanges = $board->recentChanges()
+            ->with('user:name')
+            ->orderBy('changed_at', 'desc')
+            ->get();
+
         return response()->json($recentChanges);
     }
+
 }

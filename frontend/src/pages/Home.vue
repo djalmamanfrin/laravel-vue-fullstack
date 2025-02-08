@@ -1,10 +1,19 @@
 <script setup>
-import {computed, onBeforeMount, onMounted, ref} from "vue";
+import {computed, onBeforeMount, ref} from "vue";
 import BoardLayout from "../components/BoardLayout.vue";
 import MyTab from "../components/atoms/MyTab.vue";
 import useImageStore from "../store/image.js";
 import useBoardStore from "../store/board.js";
 import MyImage from "../components/atoms/MyImage.vue";
+import MyNotification from "../components/atoms/MyNotification.vue";
+import router from "../router.js";
+
+const showNotification = ref(false);
+const notification = ref({
+  type: '',
+  title: '',
+  message: '',
+})
 
 const imageStore = useImageStore();
 const images = computed(() => imageStore.images)
@@ -32,11 +41,29 @@ const handleTabChanged = (tabId) => {
 
 onBeforeMount(() => {
   imageStore.all()
+  boardStore.all()
 })
 
-onMounted(() => {
-  boardStore.fetchBoards()
-})
+const handleCreateBoard = () => {
+  boardStore.create()
+      .then(({data}) => {
+        debugger
+        notification.value.type = 'success';
+        notification.value.title = 'Successfully saved!';
+        notification.value.message = 'Your board has been successfully created and is ready to use';
+        showNotification.value = true;
+
+        setTimeout(() => {
+          router.push({ name: 'Board', params: { id: data.id } })
+        }, 5000);
+      })
+      .catch(() => {
+        notification.value.type = 'error';
+        notification.value.title = 'Error board!';
+        notification.value.message = 'Error to create the board';
+        showNotification.value = true;
+      })
+}
 </script>
 
 <template>
@@ -53,10 +80,17 @@ onMounted(() => {
         </div>
       </div>
       <div v-if="activeTab === 2" class="mx-auto flex max-w-2xl items-center space-x-2 px-4 sm:px-6 lg:max-w-7xl lg:px-8">
-        <BoardLayout :boards="boards"/>
+        <BoardLayout :boards="boards" @handle-create-board="handleCreateBoard" />
       </div>
     </div>
   </div>
+  <MyNotification
+      v-if="showNotification"
+      :type="notification.type"
+      :title="notification.title"
+      :message="notification.message"
+      @close="showNotification = false"
+  />
 </template>
 
 <style scoped>

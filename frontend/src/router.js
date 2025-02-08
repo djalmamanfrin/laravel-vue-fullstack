@@ -4,7 +4,7 @@ import Signup from "./pages/Signup.vue";
 import Login from "./pages/Login.vue";
 import Home from "./pages/Home.vue";
 import NotFound from "./pages/NotFound.vue";
-import BoardView from "./pages/BoardView.vue";
+import Board from "./pages/Board.vue";
 import useUserStore from "./store/user.js";
 
 const routes = [
@@ -13,7 +13,7 @@ const routes = [
     component: DefaultLayout,
     children: [
       {path: '/', name: 'Home', component: Home},
-      {path: '/board/:id', name: 'Board', component: BoardView},
+      {path: '/board/:id', name: 'Board', component: Board},
     ],
     beforeEnter: async (to, from, next) => {
       try {

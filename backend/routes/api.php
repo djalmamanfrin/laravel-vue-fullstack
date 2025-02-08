@@ -1,8 +1,6 @@
 <?php
 
 use App\Http\Controllers\BoardController;
-use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\ImageController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;

@@ -51,7 +51,8 @@ class ImageController extends Controller
             $image = Image::updateOrcreate(
                 ['id' => $imageId],
                 $validated,
-            );
+            );;
+            $image->forceFill($validated);
             if ($request->filled('description')) {
                 $image->fill(['patch' => $request->description]);
                 preg_match_all('/#(\w+)/', $request->description, $matches);
@@ -67,6 +68,7 @@ class ImageController extends Controller
                 }
                 $image->hashtags()->sync($data);
             }
+            $image->save();
             DB::commit();
             return response()->json($image);
         } catch (\Throwable $exception) {
