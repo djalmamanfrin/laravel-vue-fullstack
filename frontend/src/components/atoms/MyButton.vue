@@ -1,5 +1,9 @@
 <script setup>
 defineProps({
+  type: {
+    type: String,
+    default: 'button',
+  },
   name: {
     type: String,
     required: true,
@@ -28,9 +32,9 @@ defineProps({
 </script>
 
 <template>
-  <button type="button" :title="title" :name="name" :disabled="isDisabled"
+  <button :type="type" :title="title" :name="name" :disabled="isDisabled"
           :class="`bg-${color}-600 hover:bg-${color}-500 focus-visible:outline-${color}-600`"
-          class="inline-flex items-center gap-2 cursor-pointer rounded-md px-8 py-3 text-sm font-semibold text-white shadow-xs  focus-visible:outline-2 focus-visible:outline-offset-2"
+          class="flex w-full justify-center cursor-pointer rounded-md bg-indigo-600 px-3 py-3 text-sm/6 font-semibold text-white shadow-xs focus-visible:outline-2 focus-visible:outline-offset-2"
   >
     <component :is="leftIcon" class="block size-5" aria-hidden="true" />
     {{ name.charAt(0).toUpperCase() + name.slice(1) }}

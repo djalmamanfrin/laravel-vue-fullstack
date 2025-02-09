@@ -3,6 +3,7 @@ import GuestLayout from "../components/GuestLayout.vue";
 import {ref} from "vue";
 import axiosClient from "../axios.js";
 import router from "../router.js";
+import MyButton from "../components/atoms/MyButton.vue";
 
 const data = ref({
   name: '',
@@ -94,9 +95,7 @@ function submit() {
         </div>
 
         <div>
-          <button type="submit" class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-            Create an Account
-          </button>
+          <MyButton type="submit" name="Create an account" />
         </div>
       </form>
 
