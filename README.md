@@ -68,6 +68,23 @@ If the port is not 5173, change it to your respective local environment port in 
         env('FRONTEND_URL') ? ','.parse_url(env('FRONTEND_URL'), PHP_URL_HOST) : ''
     ))),
 ```
+## Screenshots
+Here are some screenshots of the system:
+
+### Signup
+![board.png](screenchots%2Fsignup.png)
+
+### Login
+![board.png](screenchots%2Flogin.png)
+
+### Board Page
+![board.png](screenchots%2Fhome.png)
+
+### Board Page
+![board.png](screenchots%2Fboard.png)
+
+### Board Page
+![board.png](screenchots%2Frecent-changes.png)
 
 ## Other Useful Commands
 
