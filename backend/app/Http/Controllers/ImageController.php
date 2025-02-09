@@ -44,6 +44,7 @@ class ImageController extends Controller
             'path' => ['nullable', 'string'],
             'collection_id' => ['nullable', 'integer',  'exists:collections,id'],
             'title' => ['nullable', 'string', 'max:60'],
+            'description' => ['nullable', 'string', 'max:600'],
         ]);
 
         try {
@@ -54,7 +55,6 @@ class ImageController extends Controller
             );;
             $image->forceFill($validated);
             if ($request->filled('description')) {
-                $image->fill(['patch' => $request->description]);
                 preg_match_all('/#(\w+)/', $request->description, $matches);
                 $hashtags = $matches[1] ?? [];
 

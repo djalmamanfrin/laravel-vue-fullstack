@@ -7,6 +7,8 @@ import useBoardStore from "../store/board.js";
 import MyImage from "../components/atoms/MyImage.vue";
 import MyNotification from "../components/atoms/MyNotification.vue";
 import router from "../router.js";
+import PlusIcon from "@heroicons/vue/24/outline/PlusIcon.js";
+import useModalStore from "../store/modal.js";
 
 const showNotification = ref(false);
 const notification = ref({
@@ -15,6 +17,7 @@ const notification = ref({
   message: '',
 })
 
+const modal = useModalStore()
 const imageStore = useImageStore();
 const images = computed(() => imageStore.images)
 
@@ -46,8 +49,8 @@ onBeforeMount(() => {
 
 const handleCreateBoard = () => {
   boardStore.create()
-      .then(({data}) => {
-        debugger
+      .then((data) => {
+        console.log(data)
         notification.value.type = 'success';
         notification.value.title = 'Successfully saved!';
         notification.value.message = 'Your board has been successfully created and is ready to use';
@@ -55,7 +58,7 @@ const handleCreateBoard = () => {
 
         setTimeout(() => {
           router.push({ name: 'Board', params: { id: data.id } })
-        }, 5000);
+        }, 2000);
       })
       .catch(() => {
         notification.value.type = 'error';
@@ -72,7 +75,10 @@ const handleCreateBoard = () => {
       <MyTab :tabs="tabs" :active-tab="activeTab" @tab-changed="handleTabChanged"/>
       <div v-if="activeTab === 1" class="mx-auto flex max-w-2xl items-center space-x-2 px-4 sm:px-6 lg:max-w-7xl lg:px-8">
         <div class="mx-auto grid max-w-7xl grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          <article v-for="image in images" :key="image.id" class="flex flex-col items-start justify-between">
+          <div @click="modal.open()" class="flex items-center justify-center bg-gray-50 border border-gray-200 hover:bg-gray-100 hover:border-gray-300 cursor-pointer rounded-lg h-56 w-56">
+            <PlusIcon class="w-12 h-12 text-gray-400" />
+          </div>
+          <article v-for="image in images" :key="image.id" class="flex flex-col items-start justify-between h-56 w-56">
             <div class="relative mt-1 flex items-center gap-x-4 group w-full">
               <MyImage :image="image" />
             </div>

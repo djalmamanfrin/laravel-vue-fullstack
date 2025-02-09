@@ -27,6 +27,7 @@ const useBoardStore = defineStore('board', {
       return axiosClient.post(`/api/board/`, fields)
         .then(({data}) => {
           this.board = data
+          return data;
         })
     },
     update(fields) {

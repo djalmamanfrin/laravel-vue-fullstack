@@ -31,8 +31,8 @@ class ImageObserver
             $newCollectionName = $newCollection->name ?? 'My local images';
 
             $action = match (true) {
-                is_null($oldCollection) && !is_null($newCollection) => "Image moved to '{$newCollectionName}' by {$loggedInUser->name}",
-                !is_null($oldCollection) && is_null($newCollection) => "Image rolled back from '{$oldCollectionName}' to My local images by {$loggedInUser->name}",
+                is_null($oldCollection) && !is_null($newCollection) => "Image {$image->title} moved to '{$newCollectionName}' by {$loggedInUser->name}",
+                !is_null($oldCollection) && is_null($newCollection) => "Image {$image->title} rolled back from '{$oldCollectionName}' to My local images by {$loggedInUser->name}",
                 default => "Image {$image->title} moved from '{$oldCollectionName}' to '{$newCollectionName}' by {$loggedInUser->name}",
             };
 

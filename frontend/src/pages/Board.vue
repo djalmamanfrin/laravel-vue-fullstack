@@ -376,7 +376,7 @@ const getColumnClass = (index) => {
               <DialogPanel class="pointer-events-auto relative w-screen max-w-md">
                 <TransitionChild as="template" enter="ease-in-out duration-500" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in-out duration-500" leave-from="opacity-100" leave-to="opacity-0">
                   <div class="absolute top-0 left-0 -ml-8 flex pt-4 pr-2 sm:-ml-10 sm:pr-4">
-                    <button type="button" class="relative ursor-pointer rounded-md text-gray-300 hover:text-white focus:ring-2 focus:ring-white focus:outline-hidden" @click="isDrawerOpened = false">
+                    <button type="button" class="relative cursor-pointer rounded-md text-gray-300 hover:text-white focus:ring-2 focus:ring-white focus:outline-hidden" @click="isDrawerOpened = false">
                       <span class="absolute -inset-2.5" />
                       <span class="sr-only">Close panel</span>
                       <XMarkIcon class="size-6" aria-hidden="true" />
