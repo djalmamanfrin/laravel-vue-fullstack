@@ -17,12 +17,13 @@ import {ExclamationTriangleIcon, PlusIcon} from "@heroicons/vue/24/outline/index
 import MyButton from "./atoms/MyButton.vue";
 import MyModal from "./atoms/MyModal.vue";
 import useImageStore from "../store/image.js";
+import useModalStore from "../store/modal.js";
+
+const modal = useModalStore();
 
 const imageStore = useImageStore()
 const userStore = useUserStore()
 const user = computed(() => userStore.user)
-
-const isModalOpened = ref(false)
 
 const image = ref(null)
 const imagePreview = ref(imageStore.selectedImage?.path ?? null)
@@ -37,7 +38,7 @@ const errors = ref({
 
 const handleCloseImage = () => {
   imageStore.setSelectedImage(null);
-  isModalOpened.value = false
+  modal.close()
 };
 
 const handleDeleteImage = (image) => {
@@ -89,7 +90,7 @@ const submit = () => {
 
 <template>
   <div class="min-h-full">
-    <MyModal size="max-w-3xl" :is-opened="isModalOpened" @close-modal="isModalOpened = false">
+    <MyModal size="max-w-3xl" :is-opened="modal.isOpened" @close-modal="modal.close()">
       <form @submit.prevent="submit">
         <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
           <div class="sm:flex sm:items-center sm:space-x-4">
@@ -174,9 +175,6 @@ const submit = () => {
       <div class="mx-auto max-w-7xl">
         <div class="flex h-16 items-center justify-between">
           <div class="flex items-center">
-            <div class="shrink-0">
-              <img class="size-8" src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=500" alt="Your Company" />
-            </div>
           </div>
           <div class="hidden md:block">
             <div class="ml-4 flex items-center md:ml-6 gap-8">
@@ -185,7 +183,7 @@ const submit = () => {
                 <!-- Profile dropdown -->
                 <Menu as="div" class="relative ml-3">
                   <div>
-                    <MenuButton class="relative flex max-w-xs items-center rounded-full bg-gray-800 text-sm focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden">
+                    <MenuButton class="relative flex cursor-pointer max-w-xs items-center rounded-full bg-gray-800 text-sm focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden">
                       <span class="absolute -inset-1.5" />
                       <span class="sr-only">Open user menu</span>
                       <img class="size-8 rounded-full"
@@ -202,7 +200,7 @@ const submit = () => {
                   </transition>
                 </Menu>
               </div>
-              <MyButton @click="isModalOpened = true" name="upload images" :left-icon="PlusIcon" />
+              <MyButton @click="modal.open()" name="upload images" :left-icon="PlusIcon" />
             </div>
           </div>
           <div class="-mr-2 flex md:hidden">
