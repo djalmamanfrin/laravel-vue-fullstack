@@ -2,11 +2,11 @@
 import {useRoute} from 'vue-router';
 import useBoardStore from "../store/board.js";
 import {computed, onBeforeMount, onMounted, ref, watch} from "vue";
-import { CalendarDaysIcon, UserCircleIcon, ViewColumnsIcon, PhotoIcon, PlusIcon, PencilIcon, BellIcon, BellAlertIcon, TrashIcon, ChevronLeftIcon } from '@heroicons/vue/24/outline'
+import { CalendarDaysIcon, UserCircleIcon, ViewColumnsIcon, PhotoIcon, PlusIcon, BellIcon, BellAlertIcon, TrashIcon, ChevronLeftIcon } from '@heroicons/vue/24/outline'
 import MyButton from "../components/atoms/MyButton.vue";
 import useImageStore from "../store/image.js";
 import MyImage from "../components/atoms/MyImage.vue";
-import {XMarkIcon} from "@heroicons/vue/24/outline/index.js";
+import {PencilIcon, XMarkIcon} from "@heroicons/vue/24/outline/index.js";
 import {Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot} from "@headlessui/vue";
 import MyEdetibleText from "../components/atoms/MyEdetibleText.vue";
 
@@ -21,8 +21,8 @@ const recentChanges = computed(() => boardStore.recentChanges)
 const imageStore = useImageStore();
 const images = computed(() => imageStore.images)
 
-const removeBoardCollection = (item) => {
-  boardStore.deleteCollection(item.id)
+const handleDeleteCollection = (collectionId) => {
+  boardStore.deleteCollection(collectionId)
 }
 
 const handleCreateCollection = () => {
@@ -35,8 +35,12 @@ const handleCreateCollection = () => {
 }
 
 const handleBoardNameChanged = (value) => {
-  debugger
   boardStore.update({name: value})
+}
+
+const handleCollectionNameChanged = (value, collectionId) => {
+  let capitalizeValue = value.charAt(0).toUpperCase() + value.slice(1)
+  boardStore.updateCollection(collectionId, {name: capitalizeValue})
 }
 
 watch(() => imageStore.images, () => {
@@ -90,11 +94,19 @@ const getColumnClass = (index) => {
     <div class="mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8">
       <div class="lg:flex lg:items-center lg:justify-between">
         <div class="min-w-0 flex-1">
-          <div class="flex items-center">
+          <div class="flex items-center group">
             <button onclick="window.history.back()" class="">
               <ChevronLeftIcon class="block size-8 cursor-pointer font-semibold" aria-hidden="true"/>
             </button>
-            <MyEdetibleText :text="board.name" @text-changed="handleBoardNameChanged" />
+            <MyEdetibleText
+              :text="board.name"
+              html-tag="h2"
+              styleText="text-2xl/7 font-bold text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight"
+              @text-changed="handleBoardNameChanged"
+            />
+            <PencilIcon
+                class="size-5 text-gray-500 cursor-pointer ml-2 opacity-0 group-hover:opacity-100 transition-opacity"
+            />
           </div>
           <div class="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
             <div v-if="board.owner" class="mt-2 flex items-center text-sm text-gray-500 gap-1">
@@ -197,9 +209,20 @@ const getColumnClass = (index) => {
           >
             <div class="absolute inset-px rounded-lg bg-white" :class="getColumnClass(index)" />
 
-            <div class="relative px-3 pt-4">
-              <p class="text-lg font-medium tracking-tight text-gray-950 text-center">{{ collection.name }}</p>
+            <div class="relative flex items-center justify-center w-full pt-4 px-3 group">
+              <MyEdetibleText
+                  :text="collection.name"
+                  html-tag="p"
+                  styleText="block w-full text-center text-lg font-medium tracking-tight text-gray-950"
+                  @text-changed="handleCollectionNameChanged($event, collection.id)"
+              />
+              <div
+                @click="handleDeleteCollection(collection.id)"
+                class="absolute top-[15px] right-2 p-1 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                <TrashIcon class="size-5 text-red-500"/>
+              </div>
             </div>
+
             <div
                 @drop="onImageDrop($event, collection.id)"
                 @dragenter.prevent

@@ -115,13 +115,17 @@ class BoardController extends Controller
 
     public function reorderCollection(Request $request, int $boardId, int $collectionId): JsonResponse
     {
-        $request->validate([
-            'order' => 'required|integer|min:1|max:5',
-        ]);
-
         $board = Board::findOrFail($boardId);
         $collection = $board->collections()->findOrFail($collectionId);
-        $collection->update(['order' => $request->order]);
+
+        $request->validate([
+            'name' => 'nullable|string|max:60',
+            'order' => 'nullable|integer|min:1|max:5',
+        ]);
+
+        $collection
+            ->forceFill($request->all())
+            ->save();
 
         return response()->json($board->load('collections'));
     }
