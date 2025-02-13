@@ -8,6 +8,7 @@ import useImageStore from "../store/image.js";
 import MyImage from "../components/atoms/MyImage.vue";
 import {XMarkIcon} from "@heroicons/vue/24/outline/index.js";
 import {Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot} from "@headlessui/vue";
+import MyEdetibleText from "../components/atoms/MyEdetibleText.vue";
 
 const route = useRoute();
 const boardId = route.params.id;
@@ -20,14 +21,12 @@ const recentChanges = computed(() => boardStore.recentChanges)
 const imageStore = useImageStore();
 const images = computed(() => imageStore.images)
 
-const combineCollections = ref([]);
-
 const removeBoardCollection = (item) => {
   boardStore.deleteCollection(item.id)
 }
 
 const handleCreateCollection = () => {
-  if (combineCollections.value.length >= 5) {
+  if (board.value.collections.length >= 5) {
     return;
   }
   let fields = {name: 'Untitled', order: board.value.collections.length + 1}
@@ -35,18 +34,10 @@ const handleCreateCollection = () => {
       .catch(error => {})
 }
 
-const editableName = ref(null)
-const editing = ref(false)
-
-const saveName = () => {
-  if (!editing.value) return;
-  editing.value = false;
-  boardStore.update({name: editableName.value})
-};
-
-watch(() => editing.value, () => {
-  editableName.value = board.value.name;
-});
+const handleBoardNameChanged = (value) => {
+  debugger
+  boardStore.update({name: value})
+}
 
 watch(() => imageStore.images, () => {
   boardStore.get(boardId)
@@ -103,27 +94,7 @@ const getColumnClass = (index) => {
             <button onclick="window.history.back()" class="">
               <ChevronLeftIcon class="block size-8 cursor-pointer font-semibold" aria-hidden="true"/>
             </button>
-            <div class="relative group flex items-center">
-              <input
-                  v-if="editing"
-                  v-model="editableName"
-                  @blur="saveName"
-                  @keyup.enter="saveName"
-                  class="text-2xl/7 font-bold text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight border border-gray-300 rounded px-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  autofocus
-              />
-              <h2
-                  v-else
-                  class="text-2xl/7 font-bold text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight cursor-pointer"
-                  @click="editing = true"
-              >
-                {{ board.name }}
-              </h2>
-              <PencilIcon
-                  class="size-5 text-gray-500 cursor-pointer ml-2 opacity-70 group-hover:opacity-100 transition-opacity"
-                  @click="editing = true"
-              />
-            </div>
+            <MyEdetibleText :text="board.name" @text-changed="handleBoardNameChanged" />
           </div>
           <div class="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
             <div v-if="board.owner" class="mt-2 flex items-center text-sm text-gray-500 gap-1">
