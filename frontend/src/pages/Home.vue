@@ -10,6 +10,7 @@ import router from "../router.js";
 import PlusIcon from "@heroicons/vue/24/outline/PlusIcon.js";
 import useModalStore from "../store/modal.js";
 import useNotificationStore from "../store/notification.js";
+import {NotificationTypes} from "../types/notification-types.js";
 
 const modal = useModalStore()
 const notification = useNotificationStore()
@@ -46,8 +47,7 @@ onBeforeMount(() => {
 const handleCreateBoard = () => {
   boardStore.create()
       .then((data) => {
-        console.log(data)
-        notification.type = 'success';
+        notification.type = NotificationTypes.SUCCESS;
         notification.title = 'Successfully saved!';
         notification.message = 'Your board has been successfully created and is ready to use';
         notification.open();
@@ -57,7 +57,7 @@ const handleCreateBoard = () => {
         }, 1000);
       })
       .catch(() => {
-        notification.type = 'error';
+        notification.type = NotificationTypes.ERROR;
         notification.title = 'Error board!';
         notification.message = 'Error to create the board';
         notification.open();

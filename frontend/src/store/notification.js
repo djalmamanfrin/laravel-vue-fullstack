@@ -1,4 +1,5 @@
 import {defineStore} from "pinia";
+import {NotificationTypes} from "../types/notification-types.js";
 
 const useNotificationStore = defineStore('notification', {
   state: () => ({
@@ -9,6 +10,10 @@ const useNotificationStore = defineStore('notification', {
   }),
   actions: {
     open() {
+      if (!Object.values(NotificationTypes).includes(type)) {
+        console.error(`Invalid notification type: ${type}`);
+        return;
+      }
       this.isOpened = true
     },
     close() {

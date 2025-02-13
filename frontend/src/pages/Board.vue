@@ -13,6 +13,7 @@ import useNotificationStore from "../store/notification.js";
 import MyNotification from "../components/atoms/MyNotification.vue";
 import useDrawerStore from "../store/drawer.js";
 import MyDrawer from "../components/atoms/MyDrawer.vue";
+import {NotificationTypes} from "../types/notification-types.js";
 
 const route = useRoute();
 const boardId = route.params.id;
@@ -33,7 +34,7 @@ const handleDeleteCollection = (collectionId) => {
 
 const handleCreateCollection = () => {
   if (board.value.collections.length >= 5) {
-    notification.type = 'warning';
+    notification.type = NotificationTypes.WARNING;
     notification.title = 'Collections limit reached';
     notification.message = 'The number of collections has exceeded the allowed limit of 5. Please remove some collections to continue.';
     notification.open();
