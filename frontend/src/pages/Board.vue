@@ -11,13 +11,14 @@ import {Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot} from 
 import MyEditableText from "../components/atoms/MyEditableText.vue";
 import useNotificationStore from "../store/notification.js";
 import MyNotification from "../components/atoms/MyNotification.vue";
+import useDrawerStore from "../store/drawer.js";
+import MyDrawer from "../components/atoms/MyDrawer.vue";
 
 const route = useRoute();
 const boardId = route.params.id;
 
-const isDrawerOpened = ref(false)
-
 const notification = useNotificationStore()
+const drawer = useDrawerStore()
 
 const boardStore = useBoardStore()
 const board = computed(() => boardStore.board)
@@ -106,6 +107,15 @@ const getColumnClass = (index) => {
       :message="notification.message"
       @close="notification.close()"
   />
+  <MyDrawer title="Recent Board Changes">
+    <div v-for="change in recentChanges" :key="change.id" class="border-b border-gray-200 pb-2">
+      <div class="flex justify-between text-sm text-gray-600">
+        <span v-if="change.user" class="font-semibold">{{ change.user.name }}</span>
+        <span>{{ change.changed_at }}</span>
+      </div>
+      <p class="text-gray-800 text-sm mt-1">{{ change.action }}</p>
+    </div>
+  </MyDrawer>
   <div class="bg-gray-50 pt-16 pb-8">
     <div class="mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8">
       <div class="lg:flex lg:items-center lg:justify-between">
@@ -144,7 +154,7 @@ const getColumnClass = (index) => {
           </div>
         </div>
         <div class="mt-5 flex lg:mt-0 lg:ml-4">
-          <span @click="isDrawerOpened = true" class="flex items-center cursor-pointer sm:ml-3">
+          <span @click="drawer.open()" class="flex items-center cursor-pointer sm:ml-3">
             <BellAlertIcon v-if="boardStore.unreadChangesCount" class="block text-yellow-500 size-6" aria-hidden="true" />
             <BellIcon v-else class="block size-6" aria-hidden="true" />
           </span>
@@ -262,49 +272,6 @@ const getColumnClass = (index) => {
       </div>
     </div>
   </div>
-
-  <TransitionRoot as="template" :show="isDrawerOpened">
-    <Dialog class="relative z-10" @close="isDrawerOpened = false">
-      <TransitionChild as="template" enter="ease-in-out duration-500" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in-out duration-500" leave-from="opacity-100" leave-to="opacity-0">
-        <div class="fixed inset-0 bg-gray-500/75 transition-opacity" />
-      </TransitionChild>
-
-      <div class="fixed inset-0 overflow-hidden">
-        <div class="absolute inset-0 overflow-hidden">
-          <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
-            <TransitionChild as="template" enter="transform transition ease-in-out duration-500 sm:duration-700" enter-from="translate-x-full" enter-to="translate-x-0" leave="transform transition ease-in-out duration-500 sm:duration-700" leave-from="translate-x-0" leave-to="translate-x-full">
-              <DialogPanel class="pointer-events-auto relative w-screen max-w-md">
-                <TransitionChild as="template" enter="ease-in-out duration-500" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in-out duration-500" leave-from="opacity-100" leave-to="opacity-0">
-                  <div class="absolute top-0 left-0 -ml-8 flex pt-4 pr-2 sm:-ml-10 sm:pr-4">
-                    <button type="button" class="relative cursor-pointer rounded-md text-gray-300 hover:text-white focus:ring-2 focus:ring-white focus:outline-hidden" @click="isDrawerOpened = false">
-                      <span class="absolute -inset-2.5" />
-                      <span class="sr-only">Close panel</span>
-                      <XMarkIcon class="size-6" aria-hidden="true" />
-                    </button>
-                  </div>
-                </TransitionChild>
-                <div class="flex h-full flex-col overflow-y-scroll bg-white py-6 shadow-xl">
-                  <div class="px-4 sm:px-6">
-                    <DialogTitle class="text-base font-semibold text-gray-900">Recent Board Changes</DialogTitle>
-                  </div>
-
-                  <div class="relative mt-6 flex-1 px-4 sm:px-6 space-y-4">
-                    <div v-for="change in recentChanges" :key="change.id" class="border-b border-gray-200 pb-2">
-                      <div class="flex justify-between text-sm text-gray-600">
-                        <span v-if="change.user" class="font-semibold">{{ change.user.name }}</span>
-                        <span>{{ change.changed_at }}</span>
-                      </div>
-                      <p class="text-gray-800 text-sm mt-1">{{ change.action }}</p>
-                    </div>
-                  </div>
-                </div>
-              </DialogPanel>
-            </TransitionChild>
-          </div>
-        </div>
-      </div>
-    </Dialog>
-  </TransitionRoot>
 </template>
 
 <style scoped>
