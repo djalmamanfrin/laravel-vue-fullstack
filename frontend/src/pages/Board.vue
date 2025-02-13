@@ -8,12 +8,17 @@ import useImageStore from "../store/image.js";
 import MyImage from "../components/atoms/MyImage.vue";
 import {PencilIcon, XMarkIcon} from "@heroicons/vue/24/outline/index.js";
 import {Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot} from "@headlessui/vue";
-import MyEdetibleText from "../components/atoms/MyEdetibleText.vue";
+import MyEditableText from "../components/atoms/MyEditableText.vue";
+import useNotificationStore from "../store/notification.js";
+import MyNotification from "../components/atoms/MyNotification.vue";
 
 const route = useRoute();
 const boardId = route.params.id;
 
 const isDrawerOpened = ref(false)
+
+const notification = useNotificationStore()
+
 const boardStore = useBoardStore()
 const board = computed(() => boardStore.board)
 const recentChanges = computed(() => boardStore.recentChanges)
@@ -27,6 +32,10 @@ const handleDeleteCollection = (collectionId) => {
 
 const handleCreateCollection = () => {
   if (board.value.collections.length >= 5) {
+    notification.type = 'warning';
+    notification.title = 'Collections limit reached';
+    notification.message = 'The number of collections has exceeded the allowed limit of 5. Please remove some collections to continue.';
+    notification.open();
     return;
   }
   let fields = {name: 'Untitled', order: board.value.collections.length + 1}
@@ -90,6 +99,13 @@ const getColumnClass = (index) => {
 </script>
 
 <template>
+  <MyNotification
+      v-if="notification.isOpened"
+      :type="notification.type"
+      :title="notification.title"
+      :message="notification.message"
+      @close="notification.close()"
+  />
   <div class="bg-gray-50 pt-16 pb-8">
     <div class="mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8">
       <div class="lg:flex lg:items-center lg:justify-between">
@@ -98,7 +114,7 @@ const getColumnClass = (index) => {
             <button onclick="window.history.back()" class="">
               <ChevronLeftIcon class="block size-8 cursor-pointer font-semibold" aria-hidden="true"/>
             </button>
-            <MyEdetibleText
+            <MyEditableText
               :text="board.name"
               html-tag="h2"
               styleText="text-2xl/7 font-bold text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight"
@@ -210,7 +226,7 @@ const getColumnClass = (index) => {
             <div class="absolute inset-px rounded-lg bg-white" :class="getColumnClass(index)" />
 
             <div class="relative flex items-center justify-center w-full pt-4 px-3 group">
-              <MyEdetibleText
+              <MyEditableText
                   :text="collection.name"
                   html-tag="p"
                   styleText="block w-full text-center text-lg font-medium tracking-tight text-gray-950"
