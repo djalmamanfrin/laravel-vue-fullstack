@@ -9,16 +9,12 @@ import MyNotification from "../components/atoms/MyNotification.vue";
 import router from "../router.js";
 import PlusIcon from "@heroicons/vue/24/outline/PlusIcon.js";
 import useModalStore from "../store/modal.js";
-
-const showNotification = ref(false);
-const notification = ref({
-  type: '',
-  title: '',
-  message: '',
-})
+import useNotificationStore from "../store/notification.js";
 
 const modal = useModalStore()
-const imageStore = useImageStore();
+const notification = useNotificationStore()
+
+const imageStore = useImageStore()
 const images = computed(() => imageStore.images)
 
 const boardStore = useBoardStore();
@@ -51,20 +47,20 @@ const handleCreateBoard = () => {
   boardStore.create()
       .then((data) => {
         console.log(data)
-        notification.value.type = 'success';
-        notification.value.title = 'Successfully saved!';
-        notification.value.message = 'Your board has been successfully created and is ready to use';
-        showNotification.value = true;
+        notification.type = 'success';
+        notification.title = 'Successfully saved!';
+        notification.message = 'Your board has been successfully created and is ready to use';
+        notification.open();
 
         setTimeout(() => {
           router.push({ name: 'Board', params: { id: data.id } })
-        }, 2000);
+        }, 1000);
       })
       .catch(() => {
-        notification.value.type = 'error';
-        notification.value.title = 'Error board!';
-        notification.value.message = 'Error to create the board';
-        showNotification.value = true;
+        notification.type = 'error';
+        notification.title = 'Error board!';
+        notification.message = 'Error to create the board';
+        notification.open();
       })
 }
 </script>
@@ -91,11 +87,11 @@ const handleCreateBoard = () => {
     </div>
   </div>
   <MyNotification
-      v-if="showNotification"
+      v-if="notification.isOpened"
       :type="notification.type"
       :title="notification.title"
       :message="notification.message"
-      @close="showNotification = false"
+      @close="notification.close"
   />
 </template>
 
