@@ -40,10 +40,14 @@ class BoardController extends Controller
             'owner'
         ])->findOrFail($boardId);
 
+        $collections = $board->collections->sortBy('order')->values();
+        $collections->pop();
+
         $allImages = collect();
-        foreach ($board->collections as $collection) {
+        foreach ($collections as $collection) {
             $allImages = $allImages->merge($collection->images);
         }
+
         $board->images_counter = $allImages->count();
 
         return response()->json($board);

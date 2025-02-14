@@ -138,7 +138,7 @@ const getColumnClass = (index) => {
     </div>
   </MyDrawer>
   <div class="bg-gray-50 pt-16 pb-8">
-    <div class="mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8">
+    <div class="mx-auto px-6 lg:px-8">
       <div class="lg:flex lg:items-center lg:justify-between">
         <div class="min-w-0 flex-1">
           <div v-if="board.name" class="flex items-center group">
