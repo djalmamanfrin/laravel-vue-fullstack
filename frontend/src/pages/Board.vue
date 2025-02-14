@@ -1,19 +1,21 @@
 <script setup>
 import {useRoute} from 'vue-router';
 import useBoardStore from "../store/board.js";
-import {computed, onBeforeMount, onMounted, ref, watch} from "vue";
-import { CalendarDaysIcon, UserCircleIcon, ViewColumnsIcon, PhotoIcon, PlusIcon, BellIcon, BellAlertIcon, TrashIcon, ChevronLeftIcon } from '@heroicons/vue/24/outline'
+import {computed, onBeforeMount, onMounted, watch} from "vue";
+import { CalendarDaysIcon, UserCircleIcon, ViewColumnsIcon, PhotoIcon, PlusIcon, BellIcon, BellAlertIcon, TrashIcon,
+  ChevronLeftIcon, ArchiveBoxIcon } from '@heroicons/vue/24/outline'
 import MyButton from "../components/atoms/MyButton.vue";
 import useImageStore from "../store/image.js";
 import MyImage from "../components/atoms/MyImage.vue";
-import {PencilIcon, XMarkIcon} from "@heroicons/vue/24/outline/index.js";
-import {Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot} from "@headlessui/vue";
+import {PencilIcon} from "@heroicons/vue/24/outline/index.js";
 import MyEditableText from "../components/atoms/MyEditableText.vue";
 import useNotificationStore from "../store/notification.js";
 import MyNotification from "../components/atoms/MyNotification.vue";
 import useDrawerStore from "../store/drawer.js";
 import MyDrawer from "../components/atoms/MyDrawer.vue";
 import {NotificationTypes} from "../types/notification-types.js";
+import router from "../router.js";
+import MyTooltip from "../components/atoms/MyTooltip.vue";
 
 const route = useRoute();
 const boardId = route.params.id;
@@ -32,6 +34,25 @@ const handleDeleteCollection = (collectionId) => {
   boardStore.deleteCollection(collectionId)
 }
 
+const handleDeleteBoard = () => {
+  if (board.value.images_counter > 0) {
+    notification.type = NotificationTypes.ERROR;
+    notification.title = 'Board cannot be archived';
+    notification.message = 'You cannot archive this board because it still contains images. Please remove them first.';
+    notification.open();
+    return;
+  }
+
+  boardStore.delete().then(() => {
+    router.push({ name: 'Home'})
+
+    notification.type = NotificationTypes.SUCCESS;
+    notification.title = 'Board successfully deleted';
+    notification.message = 'The board has been deleted successfully. All related data has been removed';
+    notification.open();
+  })
+}
+
 const handleCreateCollection = () => {
   if (board.value.collections.length >= 5) {
     notification.type = NotificationTypes.WARNING;
@@ -44,7 +65,6 @@ const handleCreateCollection = () => {
   boardStore.createCollection(fields)
       .catch(error => {})
 }
-
 const handleBoardNameChanged = (value) => {
   boardStore.update({name: value})
 }
@@ -121,7 +141,7 @@ const getColumnClass = (index) => {
     <div class="mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8">
       <div class="lg:flex lg:items-center lg:justify-between">
         <div class="min-w-0 flex-1">
-          <div class="flex items-center group">
+          <div v-if="board.name" class="flex items-center group">
             <button onclick="window.history.back()" class="">
               <ChevronLeftIcon class="block size-8 cursor-pointer font-semibold" aria-hidden="true"/>
             </button>
@@ -154,7 +174,10 @@ const getColumnClass = (index) => {
             </div>
           </div>
         </div>
-        <div class="mt-5 flex lg:mt-0 lg:ml-4">
+        <div class="mt-5 flex justify-center">
+          <MyTooltip @click="handleDeleteBoard" position="bottom" text="Archive board" class="flex justify-center items-center cursor-pointer">
+              <ArchiveBoxIcon class="size-5 text-red-500"/>
+          </MyTooltip>
           <span @click="drawer.open()" class="flex items-center cursor-pointer sm:ml-3">
             <BellAlertIcon v-if="boardStore.unreadChangesCount" class="block text-yellow-500 size-6" aria-hidden="true" />
             <BellIcon v-else class="block size-6" aria-hidden="true" />

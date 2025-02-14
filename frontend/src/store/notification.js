@@ -10,8 +10,8 @@ const useNotificationStore = defineStore('notification', {
   }),
   actions: {
     open() {
-      if (!Object.values(NotificationTypes).includes(type)) {
-        console.error(`Invalid notification type: ${type}`);
+      if (!Object.values(NotificationTypes).includes(this.type)) {
+        console.error(`Invalid notification type: ${this.type}`);
         return;
       }
       this.isOpened = true

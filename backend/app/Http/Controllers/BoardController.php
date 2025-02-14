@@ -98,6 +98,22 @@ class BoardController extends Controller
         }
     }
 
+    public function destroy(Board $board): JsonResponse
+    {
+        try {
+            DB::beginTransaction();
+            $board->delete();
+            DB::commit();
+            return response()->json(null, Response::HTTP_NO_CONTENT);
+        } catch (\Throwable $exception) {
+            return response()->json([
+                'error' => 'An error occurred while processing the request.',
+                'message' => $exception->getMessage(),
+                'code' => $exception->getCode(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+    }
+
     public function createCollection(Request $request, int $boardId): JsonResponse
     {
         $validated = $request->validate([

@@ -30,6 +30,13 @@ const useBoardStore = defineStore('board', {
           return data;
         })
     },
+    delete() {
+      let boardId = this.board.id
+      return axiosClient.delete(`/api/board/${boardId}`)
+        .then(() => {
+          this.board = null
+        })
+    },
     update(fields) {
       let boardId = this.board.id
       return axiosClient.patch(`/api/board/${boardId}`, fields)

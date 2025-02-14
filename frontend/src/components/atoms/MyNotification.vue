@@ -4,13 +4,15 @@ import CheckCircleIcon from "@heroicons/vue/24/outline/CheckCircleIcon";
 import XMarkIcon from "@heroicons/vue/24/outline/XMarkIcon";
 import ExclamationTriangleIcon from "@heroicons/vue/24/outline/ExclamationTriangleIcon";
 import InformationCircleIcon from "@heroicons/vue/24/outline/InformationCircleIcon";
+import {NotificationTypes} from "../../types/notification-types.js";
 
 const props = defineProps({
   title: String,
   message: String,
   type: {
     type: String,
-    default: 'info', // Pode ser 'success', 'error', 'warning' ou 'info'
+    default: 'info',
+    validator: (value) => Object.values(NotificationTypes).includes(value)
   }
 });
 
