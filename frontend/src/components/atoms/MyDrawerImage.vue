@@ -33,13 +33,13 @@ const actions = [
       <Disclosure as="nav" class="bg-white border-b border-gray-200">
         <div class="mx-auto max-w-7xl">
           <div class="flex h-24 items-center justify-between cursor-pointer">
-            <div class="flex justify-start items-center w-full pr-3 pl-6 group">
+            <div class="flex justify-start items-center w-full pr-3 pl-6">
               <MyEditableText style-text="block text-2xl font-medium tracking-tight"
-                              html-tag="h2" :text="image.title"/>
-
-              <PencilIcon
-                  class="size-5 text-gray-500 cursor-pointer ml-2 opacity-0 group-hover:opacity-100 transition-opacity"
-              />
+                              html-tag="h2" :text="image.title">
+                <PencilIcon
+                    class="size-5 text-gray-500 cursor-pointer ml-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                />
+              </MyEditableText>
             </div>
             <div class="flex justify-center w-1/2">
               <MyButton name="Save Changes" />
@@ -65,11 +65,13 @@ const actions = [
       </Disclosure>
     </template>
     <template #main>
-      <img
-          :src="image.path"
-          alt=""
-          class="w-full max-h-[300px] rounded-lg cursor-pointer bg-white object-cover group-hover:opacity-75 group-hover:brightness-50"
-      />
+      <div class="col-span-full">
+        <img
+            :src="image.path"
+            alt=""
+            class="w-full max-h-[300px] rounded-lg"
+        />
+      </div>
       <div class="col-span-full">
         <label for="about" class="block text-sm/6 font-medium text-gray-900">Description</label>
         <div class="mt-2">

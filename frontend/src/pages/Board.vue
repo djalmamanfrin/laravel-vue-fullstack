@@ -147,10 +147,11 @@ const getColumnClass = (index) => {
               html-tag="h2"
               styleText="text-2xl/7 font-bold text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight"
               @text-changed="handleBoardNameChanged"
-            />
-            <PencilIcon
-                class="size-5 text-gray-500 cursor-pointer ml-2 opacity-0 group-hover:opacity-100 transition-opacity"
-            />
+            >
+              <PencilIcon
+                  class="size-5 text-gray-500 cursor-pointer ml-2 opacity-0 group-hover:opacity-100 transition-opacity"
+              />
+            </MyEditableText>
           </div>
           <div class="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
             <div v-if="board.owner" class="mt-2 flex items-center text-sm text-gray-500 gap-1">
@@ -158,13 +159,13 @@ const getColumnClass = (index) => {
               <span>Owner <b class="pl-1">{{ board.owner.name }}</b></span>
             </div>
             <div class="mt-2 flex items-center text-sm text-gray-500 gap-1">
-              <MyTooltip @click="handleDeleteBoard" position="bottom" text="The last column is not included in the count" class="flex justify-center items-center cursor-pointer">
+              <MyTooltip @click="handleDeleteBoard" position="top" text="The last column is not included in the count" class="flex justify-center items-center cursor-pointer">
                 <PhotoIcon class="block size-7" aria-hidden="true" />
                 <span><b class="pl-1">{{ board.images_counter }} images</b> being worked on</span>
               </MyTooltip>
             </div>
             <div class="mt-2 flex items-center text-sm text-gray-500 gap-1">
-              <MyTooltip @click="handleDeleteBoard" position="bottom" text="The My local images column is not included in the count" class="flex justify-center items-center cursor-pointer">
+              <MyTooltip @click="handleDeleteBoard" position="top" text="The My local images column is not included in the count" class="flex justify-center items-center cursor-pointer">
                 <ViewColumnsIcon class="block size-7" aria-hidden="true" />
                 <span><b class="pl-1"> {{ board.collections.length }} / 5</b> available collection</span>
               </MyTooltip>
@@ -176,8 +177,8 @@ const getColumnClass = (index) => {
           </div>
         </div>
         <div class="mt-5 flex justify-center">
-          <MyTooltip @click="handleDeleteBoard" position="top" text="Archive board" class="flex justify-center items-center cursor-pointer">
-              <ArchiveBoxIcon class="size-6 text-red-500"/>
+          <MyTooltip position="top" text="Archive board" class="flex justify-center items-center cursor-pointer">
+              <ArchiveBoxIcon @click="handleDeleteBoard" class="size-6 text-red-500"/>
           </MyTooltip>
           <MyRecentChanges/>
           <MyButton @click="handleCreateCollection" name="collection" :left-icon="PlusIcon" />
@@ -261,12 +262,13 @@ const getColumnClass = (index) => {
                   html-tag="p"
                   styleText="block w-full text-center text-lg font-medium tracking-tight text-gray-950"
                   @text-changed="handleCollectionNameChanged($event, collection.id)"
-              />
-              <div
-                @click="handleDeleteCollection(collection.id)"
-                class="absolute top-[15px] right-2 p-1 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-                <TrashIcon class="size-5 text-red-500"/>
-              </div>
+              >
+                <div
+                    @click="handleDeleteCollection(collection.id)"
+                    class="absolute top-[15px] right-2 p-1 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                  <TrashIcon class="size-5 text-red-500"/>
+                </div>
+              </MyEditableText>
             </div>
 
             <div

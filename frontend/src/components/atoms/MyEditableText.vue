@@ -58,9 +58,12 @@ watch(() => props.text, (newValue) => {
         :class="[styleText, 'w-full border border-gray-300 rounded px-2 focus:outline-none focus:ring-2 focus:ring-indigo-500']"
         autofocus
     />
-    <component v-else :is="props.htmlTag" @click="startEditing" :class="[styleText, 'relative cursor-pointer']">
+  <div v-else class=" flex items-center group">
+    <component :is="props.htmlTag" @click="startEditing" :class="[styleText, 'relative cursor-pointer']">
       {{ text }}
     </component>
+    <slot/>
+  </div>
 </template>
 
 <style scoped>

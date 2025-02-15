@@ -30,7 +30,7 @@ const drawer = useDrawerStore()
                 </TransitionChild>
                 <slot name="header"></slot>
                 <div class="flex h-full flex-col overflow-y-scroll bg-white shadow-xl">
-                  <div class="relative mt-6 flex-1 overflow-y-auto px-4 sm:px-6 space-y-4">
+                  <div class="relative mt-6 flex-1 px-4 sm:px-6 space-y-4">
                     <slot name="main"></slot>
                   </div>
                 </div>
