@@ -15,6 +15,7 @@ class RecentChange extends Model
     protected $fillable = [
         'board_id',
         'user_id',
+        'change_type_id',
         'action',
         'read_at',
     ];

@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Enums\ChangeTypesId;
 use App\Models\Board;
 use App\Models\RecentChange;
 use Illuminate\Support\Facades\Auth;
@@ -13,11 +14,11 @@ class BoardObserver
      */
     public function created(Board $board): void
     {
-        $loggedInUser = Auth::user();
-        $action = "Board '{$board->name}' created by " . $loggedInUser->name;
+        $action = "Board <b>{$board->name}</b> created";
         RecentChange::create([
             'board_id' => $board->id,
-            'user_id' => $loggedInUser->id,
+            'user_id' => Auth::id(),
+            'change_type_id' => ChangeTypesId::BOARD,
             'action' => $action,
         ]);
     }
@@ -27,15 +28,15 @@ class BoardObserver
      */
     public function updated(Board $board): void
     {
-        $loggedInUser = Auth::user();
         if ($board->isDirty('name')) {
             $oldName = $board->getOriginal('name');
             $newName = $board->name;
 
-            $action = "Board name changed from {$oldName} to {$newName} by " . $loggedInUser->name;
+            $action = "Board name changed from <b>{$oldName}</b> to <b>{$newName}</b>";
             RecentChange::create([
                 'board_id' => $board->id,
-                'user_id' => $loggedInUser->id,
+                'user_id' => Auth::id(),
+                'change_type_id' => ChangeTypesId::BOARD,
                 'action' => $action,
             ]);
         }

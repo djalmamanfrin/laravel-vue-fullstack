@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Enums\ChangeTypesId;
 use App\Models\Collection;
 use App\Models\RecentChange;
 use Illuminate\Support\Facades\Auth;
@@ -13,11 +14,11 @@ class CollectionObserver
      */
     public function created(Collection $collection)
     {
-        $loggedInUser = Auth::user();
-        $action = "Collection '{$collection->name}' created with order {$collection->order} by " . $loggedInUser->name;
+        $action = "Collection <b>{$collection->name}</b> created with order <b>{$collection->order}</b>";
         RecentChange::create([
             'board_id' => $collection->board_id,
-            'user_id' => $loggedInUser->id,
+            'user_id' => Auth::id(),
+            'change_type_id' => ChangeTypesId::COLLECTION,
             'action' => $action,
         ]);
     }
@@ -27,18 +28,24 @@ class CollectionObserver
      */
     public function updated(Collection $collection)
     {
-        $loggedInUser = Auth::user();
+        $action = "";
         if ($collection->isDirty('order')) {
             $oldOrder = $collection->getOriginal('order');
             $newOrder = $collection->order;
-
-            $action = "Collection {$collection->name} order changed from {$oldOrder} to {$newOrder} by " . $loggedInUser->name;
-            RecentChange::create([
-                'board_id' => $collection->board_id,
-                'user_id' => $loggedInUser->id,
-                'action' => $action,
-            ]);
+            $action = "Collection <b>{$collection->name}</b> order changed from <b>{$oldOrder}</b> to <b>{$newOrder}</b>";
         }
+        if ($collection->isDirty('name')) {
+            $oldName = $collection->getOriginal('name');
+            $newName = $collection->name;
+            $action = "Collection name changed from <b>{$oldName}</b> to <b>{$newName}</b>";
+        }
+
+        RecentChange::create([
+            'board_id' => $collection->board_id,
+            'user_id' => Auth::id(),
+            'change_type_id' => ChangeTypesId::COLLECTION,
+            'action' => $action,
+        ]);
     }
 
     /**
@@ -46,11 +53,11 @@ class CollectionObserver
      */
     public function deleted(Collection $collection): void
     {
-        $loggedInUser = Auth::user();
         RecentChange::create([
             'board_id' => $collection->board_id,
-            'user_id' => $loggedInUser->id ?? 1,
-            'action' => "Collection '{$collection->name}' deleted by " . $loggedInUser->name,
+            'user_id' => Auth::id(),
+            'change_type_id' => ChangeTypesId::COLLECTION,
+            'action' => "Collection '{$collection->name}' deleted",
         ]);
     }
 

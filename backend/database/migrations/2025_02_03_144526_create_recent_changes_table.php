@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('board_id')->constrained('boards');
             $table->foreignId('user_id')->constrained('users');
+            $table->foreignId('change_type_id')->constrained('change_types');
             $table->string('action');
             $table->timestamp('changed_at')->useCurrent();
             $table->timestamp('read_at')->nullable();

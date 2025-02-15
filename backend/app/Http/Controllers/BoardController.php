@@ -173,7 +173,7 @@ class BoardController extends Controller
     {
         $board = Board::findOrFail($boardId);
         $recentChanges = $board->recentChanges()
-            ->with('user:name')
+            ->with('user')
             ->orderBy('changed_at', 'desc')
             ->get();
 

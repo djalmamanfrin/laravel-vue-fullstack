@@ -16,6 +16,7 @@ import MyDrawer from "../components/atoms/MyDrawer.vue";
 import {NotificationTypes} from "../types/notification-types.js";
 import router from "../router.js";
 import MyTooltip from "../components/atoms/MyTooltip.vue";
+import MyFlyoutMenu from "../components/atoms/MyFlyoutMenu.vue";
 
 const route = useRoute();
 const boardId = route.params.id;
@@ -175,13 +176,10 @@ const getColumnClass = (index) => {
           </div>
         </div>
         <div class="mt-5 flex justify-center">
-          <MyTooltip @click="handleDeleteBoard" position="bottom" text="Archive board" class="flex justify-center items-center cursor-pointer">
+          <MyTooltip @click="handleDeleteBoard" position="top" text="Archive board" class="flex justify-center items-center cursor-pointer">
               <ArchiveBoxIcon class="size-5 text-red-500"/>
           </MyTooltip>
-          <span @click="drawer.open()" class="flex items-center cursor-pointer sm:ml-3">
-            <BellAlertIcon v-if="boardStore.unreadChangesCount" class="block text-yellow-500 size-6" aria-hidden="true" />
-            <BellIcon v-else class="block size-6" aria-hidden="true" />
-          </span>
+          <MyFlyoutMenu title="notifications" />
           <span class="sm:ml-3">
             <MyButton @click="handleCreateCollection" name="collection" :left-icon="PlusIcon" />
           </span>

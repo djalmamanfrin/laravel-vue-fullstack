@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Enums\ChangeTypesId;
 use App\Models\Collection;
 use App\Models\Image;
 use App\Models\RecentChange;
@@ -22,7 +23,6 @@ class ImageObserver
      */
     public function updated(Image $image)
     {
-        $loggedInUser = Auth::user();
         if ($image->isDirty('collection_id')) {
             $oldCollection = Collection::find($image->getOriginal('collection_id'));
             $newCollection = Collection::find($image->collection_id);
@@ -31,15 +31,16 @@ class ImageObserver
             $newCollectionName = $newCollection->name ?? 'My local images';
 
             $action = match (true) {
-                is_null($oldCollection) && !is_null($newCollection) => "Image {$image->title} moved to '{$newCollectionName}' by {$loggedInUser->name}",
-                !is_null($oldCollection) && is_null($newCollection) => "Image {$image->title} rolled back from '{$oldCollectionName}' to My local images by {$loggedInUser->name}",
-                default => "Image {$image->title} moved from '{$oldCollectionName}' to '{$newCollectionName}' by {$loggedInUser->name}",
+                is_null($oldCollection) && !is_null($newCollection) => "Image <b>{$image->title}</b> moved to <b>{$newCollectionName}</b>",
+                !is_null($oldCollection) && is_null($newCollection) => "Image <b>{$image->title}</b> rolled back from <b>{$oldCollectionName}</b> to <b>{$newCollectionName}</b>",
+                default => "Image <b>{$image->title}</b> moved from <b>{$oldCollectionName}</b> to <b>{$newCollectionName}</b>",
             };
 
             $boardId = $newCollection->board_id ?? $oldCollection->board_id;
             RecentChange::create([
                 'board_id' => $boardId,
-                'user_id' => $loggedInUser->id,
+                'user_id' => Auth::id(),
+                'change_type_id' => ChangeTypesId::IMAGE,
                 'action' => $action,
             ]);
         }
