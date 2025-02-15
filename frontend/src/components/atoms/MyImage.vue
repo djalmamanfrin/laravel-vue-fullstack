@@ -2,6 +2,9 @@
 import { ref, onMounted } from 'vue'
 import MyDrawer from "./MyDrawer.vue";
 import useDrawerStore from "../../store/drawer.js";
+import {Disclosure} from "@headlessui/vue";
+import MyEditableText from "./MyEditableText.vue";
+import {EllipsisVerticalIcon} from "@heroicons/vue/24/outline/index.js";
 
 const props = defineProps({
   image: {
@@ -34,6 +37,20 @@ onMounted(() => {
 
 <template>
   <MyDrawer title="Image details">
+    <template #header>
+      <Disclosure as="nav" class="bg-gray-800">
+        <div class="mx-auto max-w-7xl">
+          <div class="flex h-16 items-center justify-between">
+            <MyEditableText style-text="block w-full text-center text-lg font-medium tracking-tight text-white" html-tag="h2" :text="image.title"/>
+            <div class="px-4 cursor-pointer">
+              <EllipsisVerticalIcon class="block size-6 text-white" aria-hidden="true" />
+            </div>
+          </div>
+        </div>
+      </Disclosure>
+    </template>
+    <template #main>
+    </template>
   </MyDrawer>
   <div @click="drawer.open()" ref="container" class="relative group w-full max-w-[280px] min-w-[160px] aspect-square cursor-pointer">
     <img

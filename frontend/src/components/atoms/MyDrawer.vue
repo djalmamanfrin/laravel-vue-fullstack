@@ -1,7 +1,8 @@
 <script setup>
-import {Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot} from "@headlessui/vue";
+import {Dialog, DialogPanel, DialogTitle, Disclosure, TransitionChild, TransitionRoot} from "@headlessui/vue";
 import {XMarkIcon} from "@heroicons/vue/24/outline/index.js";
 import useDrawerStore from "../../store/drawer.js";
+import MyEditableText from "./MyEditableText.vue";
 
 const drawer = useDrawerStore()
 
@@ -34,13 +35,10 @@ const props = defineProps({
                     </button>
                   </div>
                 </TransitionChild>
-                <div class="flex h-full flex-col overflow-y-scroll bg-white py-6 shadow-xl">
-                  <div class="px-4 sm:px-6">
-                    <DialogTitle class="text-base font-semibold text-gray-900">{{ title }}</DialogTitle>
-                  </div>
-
+                <div class="flex h-full flex-col overflow-y-scroll bg-white shadow-xl">
+                  <slot name="header"></slot>
                   <div class="relative mt-6 flex-1 px-4 sm:px-6 space-y-4">
-                    <slot></slot>
+                    <slot name="main"></slot>
                   </div>
                 </div>
               </DialogPanel>

@@ -203,7 +203,7 @@ const submit = () => {
               <MyButton @click="modal.open()" name="upload images" :left-icon="PlusIcon" />
             </div>
           </div>
-          <div class="-mr-2 flex md:hidden">
+          <div class="flex md:hidden mr-5">
             <!-- Mobile menu button -->
             <DisclosureButton class="relative inline-flex items-center justify-center rounded-md bg-gray-800 p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden">
               <span class="absolute -inset-0.5" />

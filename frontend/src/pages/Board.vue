@@ -168,7 +168,7 @@ const getColumnClass = (index) => {
         </div>
         <div class="mt-5 flex justify-center">
           <MyTooltip @click="handleDeleteBoard" position="top" text="Archive board" class="flex justify-center items-center cursor-pointer">
-              <ArchiveBoxIcon class="size-5 text-red-500"/>
+              <ArchiveBoxIcon class="size-6 text-red-500"/>
           </MyTooltip>
           <MyRecentChanges/>
           <MyButton @click="handleCreateCollection" name="collection" :left-icon="PlusIcon" />
