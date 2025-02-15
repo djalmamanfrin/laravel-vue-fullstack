@@ -14,7 +14,7 @@ import MyNotification from "../components/atoms/MyNotification.vue";
 import {NotificationTypes} from "../types/notification-types.js";
 import router from "../router.js";
 import MyTooltip from "../components/atoms/MyTooltip.vue";
-import MyFlyoutMenu from "../components/atoms/MyFlyoutMenu.vue";
+import MyRecentChanges from "../components/atoms/MyRecentChanges.vue";
 
 const route = useRoute();
 const boardId = route.params.id;
@@ -23,7 +23,6 @@ const notification = useNotificationStore()
 
 const boardStore = useBoardStore()
 const board = computed(() => boardStore.board)
-const recentChanges = computed(() => boardStore.recentChanges)
 
 const imageStore = useImageStore();
 const images = computed(() => imageStore.images)
@@ -171,10 +170,8 @@ const getColumnClass = (index) => {
           <MyTooltip @click="handleDeleteBoard" position="top" text="Archive board" class="flex justify-center items-center cursor-pointer">
               <ArchiveBoxIcon class="size-5 text-red-500"/>
           </MyTooltip>
-          <MyFlyoutMenu title="notifications" />
-          <span class="sm:ml-3">
-            <MyButton @click="handleCreateCollection" name="collection" :left-icon="PlusIcon" />
-          </span>
+          <MyRecentChanges/>
+          <MyButton @click="handleCreateCollection" name="collection" :left-icon="PlusIcon" />
         </div>
       </div>
 
