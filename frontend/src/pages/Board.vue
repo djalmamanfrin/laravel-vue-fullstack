@@ -2,7 +2,7 @@
 import {useRoute} from 'vue-router';
 import useBoardStore from "../store/board.js";
 import {computed, onBeforeMount, onMounted, watch} from "vue";
-import { CalendarDaysIcon, UserCircleIcon, ViewColumnsIcon, PhotoIcon, PlusIcon, BellIcon, BellAlertIcon, TrashIcon,
+import { CalendarDaysIcon, UserCircleIcon, ViewColumnsIcon, PhotoIcon, PlusIcon, TrashIcon,
   ChevronLeftIcon, ArchiveBoxIcon } from '@heroicons/vue/24/outline'
 import MyButton from "../components/atoms/MyButton.vue";
 import useImageStore from "../store/image.js";
@@ -11,8 +11,6 @@ import {PencilIcon} from "@heroicons/vue/24/outline/index.js";
 import MyEditableText from "../components/atoms/MyEditableText.vue";
 import useNotificationStore from "../store/notification.js";
 import MyNotification from "../components/atoms/MyNotification.vue";
-import useDrawerStore from "../store/drawer.js";
-import MyDrawer from "../components/atoms/MyDrawer.vue";
 import {NotificationTypes} from "../types/notification-types.js";
 import router from "../router.js";
 import MyTooltip from "../components/atoms/MyTooltip.vue";
@@ -22,7 +20,6 @@ const route = useRoute();
 const boardId = route.params.id;
 
 const notification = useNotificationStore()
-const drawer = useDrawerStore()
 
 const boardStore = useBoardStore()
 const board = computed(() => boardStore.board)
@@ -129,15 +126,6 @@ const getColumnClass = (index) => {
       :message="notification.message"
       @close="notification.close()"
   />
-  <MyDrawer title="Recent Board Changes">
-    <div v-for="change in recentChanges" :key="change.id" class="border-b border-gray-200 pb-2">
-      <div class="flex justify-between text-sm text-gray-600">
-        <span v-if="change.user" class="font-semibold">{{ change.user.name }}</span>
-        <span>{{ change.changed_at }}</span>
-      </div>
-      <p class="text-gray-800 text-sm mt-1">{{ change.action }}</p>
-    </div>
-  </MyDrawer>
   <div class="bg-gray-50 pt-16 pb-8">
     <div class="mx-auto px-6 lg:px-8">
       <div class="lg:flex lg:items-center lg:justify-between">

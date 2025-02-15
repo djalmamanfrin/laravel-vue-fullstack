@@ -1,5 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import MyDrawer from "./MyDrawer.vue";
+import useDrawerStore from "../../store/drawer.js";
 
 const props = defineProps({
   image: {
@@ -7,6 +9,8 @@ const props = defineProps({
     required: true,
   },
 })
+
+const drawer = useDrawerStore()
 
 const container = ref(null)
 const fontSize = ref('1rem')
@@ -29,7 +33,9 @@ onMounted(() => {
 </script>
 
 <template>
-  <div ref="container" class="relative group w-full max-w-[280px] min-w-[160px] aspect-square">
+  <MyDrawer title="Image details">
+  </MyDrawer>
+  <div @click="drawer.open()" ref="container" class="relative group w-full max-w-[280px] min-w-[160px] aspect-square cursor-pointer">
     <img
         :src="image.path"
         alt=""
