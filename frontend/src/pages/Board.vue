@@ -159,19 +159,23 @@ const getColumnClass = (index) => {
           <div class="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
             <div v-if="board.owner" class="mt-2 flex items-center text-sm text-gray-500 gap-1">
               <UserCircleIcon class="block size-6" aria-hidden="true" />
-              <span>Owner</span> <b>{{ board.owner.name }}</b>
+              <span>Owner <b class="pl-1">{{ board.owner.name }}</b></span>
             </div>
             <div class="mt-2 flex items-center text-sm text-gray-500 gap-1">
-              <PhotoIcon class="block size-7" aria-hidden="true" />
-              <b>{{ board.images_counter }} images</b> being worked on
+              <MyTooltip @click="handleDeleteBoard" position="bottom" text="The last column is not included in the count" class="flex justify-center items-center cursor-pointer">
+                <PhotoIcon class="block size-7" aria-hidden="true" />
+                <span><b class="pl-1">{{ board.images_counter }} images</b> being worked on</span>
+              </MyTooltip>
             </div>
             <div class="mt-2 flex items-center text-sm text-gray-500 gap-1">
-              <ViewColumnsIcon class="block size-7" aria-hidden="true" />
-              <b>{{ board.collections.length }} / 5 </b> available collection
+              <MyTooltip @click="handleDeleteBoard" position="bottom" text="The My local images column is not included in the count" class="flex justify-center items-center cursor-pointer">
+                <ViewColumnsIcon class="block size-7" aria-hidden="true" />
+                <span><b class="pl-1"> {{ board.collections.length }} / 5</b> available collection</span>
+              </MyTooltip>
             </div>
             <div class="mt-2 flex items-center text-sm text-gray-500 gap-1">
               <CalendarDaysIcon class="block size-6" aria-hidden="true" />
-              <span>Created at</span> <b>{{ board.created_at_formatted }}</b>
+              <span>Created at <b class="pl-1">{{ board.created_at_formatted }}</b></span>
             </div>
           </div>
         </div>
