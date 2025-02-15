@@ -1,7 +1,7 @@
 <script setup>
 import {useRoute} from 'vue-router';
 import useBoardStore from "../store/board.js";
-import {computed, onBeforeMount, onMounted, watch} from "vue";
+import {computed, onBeforeMount, onMounted, ref, watch} from "vue";
 import { CalendarDaysIcon, UserCircleIcon, ViewColumnsIcon, PhotoIcon, PlusIcon, TrashIcon,
   ChevronLeftIcon, ArchiveBoxIcon } from '@heroicons/vue/24/outline'
 import MyButton from "../components/atoms/MyButton.vue";
@@ -15,18 +15,26 @@ import {NotificationTypes} from "../types/notification-types.js";
 import router from "../router.js";
 import MyTooltip from "../components/atoms/MyTooltip.vue";
 import MyRecentChanges from "../components/atoms/MyRecentChanges.vue";
+import MyDrawerImage from "../components/atoms/MyDrawerImage.vue";
+import useDrawerStore from "../store/drawer.js";
 
 const route = useRoute();
 const boardId = route.params.id;
 
 const notification = useNotificationStore()
+const drawer = useDrawerStore()
 
 const boardStore = useBoardStore()
 const board = computed(() => boardStore.board)
 
 const imageStore = useImageStore();
 const images = computed(() => imageStore.images)
+const selectedImage = ref(null)
 
+const handleImageClick = (image) => {
+  selectedImage.value = image
+  drawer.open()
+}
 const handleDeleteCollection = (collectionId) => {
   boardStore.deleteCollection(collectionId)
 }
@@ -125,6 +133,7 @@ const getColumnClass = (index) => {
       :message="notification.message"
       @close="notification.close()"
   />
+  <MyDrawerImage v-if="selectedImage" :image="selectedImage"/>
   <div class="bg-gray-50 pt-16 pb-8">
     <div class="mx-auto px-6 lg:px-8">
       <div class="lg:flex lg:items-center lg:justify-between">
@@ -202,7 +211,7 @@ const getColumnClass = (index) => {
                   class="flex items-start justify-center px-4 pt-4"
               >
                 <div class="w-full flex flex-col items-start justify-start flex-grow">
-                  <MyImage :image="image" />
+                  <MyImage :image="image" @click="handleImageClick(image)" />
                 </div>
               </div>
             </div>
@@ -274,7 +283,7 @@ const getColumnClass = (index) => {
                   class="flex items-start justify-center px-4 pt-4"
               >
                 <div class="w-full flex flex-col items-start justify-start flex-grow">
-                  <MyImage :image="image"/>
+                  <MyImage :image="image" @click="handleImageClick(image)" />
                 </div>
               </div>
             </div>

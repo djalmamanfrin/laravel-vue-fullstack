@@ -21,8 +21,8 @@ const props = defineProps({
 
     <transition enter-active-class="transition ease-out duration-200" enter-from-class="opacity-0 translate-y-1" enter-to-class="opacity-100 translate-y-0" leave-active-class="transition ease-in duration-150" leave-from-class="opacity-100 translate-y-0" leave-to-class="opacity-0 translate-y-1">
       <PopoverPanel :class="[
-        'absolute z-10 mt-10 px-4',
-        position === 'left' ? '-translate-x-[10px] left-0' : 'right-0 translate-x-[10px]'
+        'absolute z-10 mt-13 px-4',
+        position === 'left' ? '-translate-x-0 left-0' : 'right-0 translate-x-0'
       ]">
         <div :class="`${width} flex-auto overflow-hidden rounded-lg bg-white text-sm/6 ring-1 shadow-lg ring-gray-900/5`">
           <slot name="main"></slot>

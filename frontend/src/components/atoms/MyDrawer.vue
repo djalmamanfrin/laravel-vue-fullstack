@@ -1,17 +1,10 @@
 <script setup>
-import {Dialog, DialogPanel, DialogTitle, Disclosure, TransitionChild, TransitionRoot} from "@headlessui/vue";
+import {Dialog, DialogPanel, TransitionChild, TransitionRoot} from "@headlessui/vue";
 import {XMarkIcon} from "@heroicons/vue/24/outline/index.js";
 import useDrawerStore from "../../store/drawer.js";
-import MyEditableText from "./MyEditableText.vue";
 
 const drawer = useDrawerStore()
 
-const props = defineProps({
-  title: {
-    type: String,
-    required: true,
-  },
-});
 </script>
 
 <template>
@@ -35,9 +28,9 @@ const props = defineProps({
                     </button>
                   </div>
                 </TransitionChild>
+                <slot name="header"></slot>
                 <div class="flex h-full flex-col overflow-y-scroll bg-white shadow-xl">
-                  <slot name="header"></slot>
-                  <div class="relative mt-6 flex-1 px-4 sm:px-6 space-y-4">
+                  <div class="relative mt-6 flex-1 overflow-y-auto px-4 sm:px-6 space-y-4">
                     <slot name="main"></slot>
                   </div>
                 </div>
