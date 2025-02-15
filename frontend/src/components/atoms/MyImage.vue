@@ -1,10 +1,11 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import {ref, onMounted} from 'vue'
 import MyDrawer from "./MyDrawer.vue";
 import useDrawerStore from "../../store/drawer.js";
 import {Disclosure} from "@headlessui/vue";
 import MyEditableText from "./MyEditableText.vue";
-import {EllipsisVerticalIcon} from "@heroicons/vue/24/outline/index.js";
+import {TrashIcon, ArchiveBoxIcon, EllipsisVerticalIcon} from "@heroicons/vue/24/outline";
+import MyFlyoutMenu from "./MyFlyoutMenu.vue";
 
 const props = defineProps({
   image: {
@@ -33,6 +34,19 @@ onMounted(() => {
     resizeObserver.observe(container.value)
   }
 })
+
+const actions = [
+  {
+    id: 1,
+    text: 'Deletar',
+    icon: TrashIcon
+  },
+  {
+    id: 2,
+    text: 'Arquivar',
+    icon: ArchiveBoxIcon
+  }
+]
 </script>
 
 <template>
@@ -41,9 +55,25 @@ onMounted(() => {
       <Disclosure as="nav" class="bg-gray-800">
         <div class="mx-auto max-w-7xl">
           <div class="flex h-16 items-center justify-between">
-            <MyEditableText style-text="block w-full text-center text-lg font-medium tracking-tight text-white" html-tag="h2" :text="image.title"/>
+            <MyEditableText style-text="block w-full text-center text-lg font-medium tracking-tight text-white"
+                            html-tag="h2" :text="image.title"/>
             <div class="px-4 cursor-pointer">
-              <EllipsisVerticalIcon class="block size-6 text-white" aria-hidden="true" />
+              <MyFlyoutMenu>
+                <template #header>
+                  <EllipsisVerticalIcon class="block size-6 text-white" aria-hidden="true"/>
+                </template>
+                <template #main>
+                  <div class="max-h-[500px] overflow-y-auto my-2 px-3">
+                    <div v-for="item in actions" :key="item.id" class="group relative flex items-center gap-x-3 rounded-md px-4 py-2 hover:bg-gray-100">
+                      <component :is="item.icon" class="size-5 text-gray-600 group-hover:text-indigo-600" aria-hidden="true" />
+                      <span class="text-gray-600 font-semibold">
+                        {{ item.text }}
+                        <span class="absolute inset-0" />
+                      </span>
+                    </div>
+                  </div>
+                </template>
+              </MyFlyoutMenu>
             </div>
           </div>
         </div>
@@ -52,7 +82,8 @@ onMounted(() => {
     <template #main>
     </template>
   </MyDrawer>
-  <div @click="drawer.open()" ref="container" class="relative group w-full max-w-[280px] min-w-[160px] aspect-square cursor-pointer">
+  <div @click="drawer.open()" ref="container"
+       class="relative group w-full max-w-[280px] min-w-[160px] aspect-square cursor-pointer">
     <img
         :src="image.path"
         alt=""

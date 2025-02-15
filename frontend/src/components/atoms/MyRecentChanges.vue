@@ -7,7 +7,7 @@ import {
   RectangleGroupIcon,
   ViewColumnsIcon
 } from "@heroicons/vue/24/outline/index.js";
-import {computed, onMounted} from "vue";
+import {computed} from "vue";
 import useBoardStore from "../../store/board.js";
 
 
@@ -43,7 +43,7 @@ const actions = [
 </script>
 
 <template>
-  <MyFlyoutMenu>
+  <MyFlyoutMenu width="w-screen max-w-lg">
     <template #header>
       <BellAlertIcon v-if="boardStore.unreadChangesCount" class="block text-yellow-500 size-6" aria-hidden="true" />
       <BellIcon v-else class="block size-6" aria-hidden="true" />
