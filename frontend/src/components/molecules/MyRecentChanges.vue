@@ -1,5 +1,5 @@
 <script setup>
-import MyFlyoutMenu from "./MyFlyoutMenu.vue";
+import MyFlyoutMenu from "../atoms/MyFlyoutMenu.vue";
 import {
   BellAlertIcon,
   BellIcon, EnvelopeIcon, EnvelopeOpenIcon, NoSymbolIcon,

@@ -14,8 +14,8 @@ import MyNotification from "../components/atoms/MyNotification.vue";
 import {NotificationTypes} from "../types/notification-types.js";
 import router from "../router.js";
 import MyTooltip from "../components/atoms/MyTooltip.vue";
-import MyRecentChanges from "../components/atoms/MyRecentChanges.vue";
-import MyDrawerImage from "../components/atoms/MyDrawerImage.vue";
+import MyRecentChanges from "../components/molecules/MyRecentChanges.vue";
+import MyDrawerImage from "../components/molecules/MyDrawerImage.vue";
 import useDrawerStore from "../store/drawer.js";
 
 const route = useRoute();

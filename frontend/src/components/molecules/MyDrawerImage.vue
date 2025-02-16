@@ -1,10 +1,10 @@
 <script setup>
 import {Disclosure} from "@headlessui/vue";
 import {ArchiveBoxIcon, EllipsisVerticalIcon, PencilIcon, TrashIcon} from "@heroicons/vue/24/outline/index.js";
-import MyEditableText from "./MyEditableText.vue";
-import MyButton from "./MyButton.vue";
-import MyDrawer from "./MyDrawer.vue";
-import MyFlyoutMenu from "./MyFlyoutMenu.vue";
+import MyEditableText from "../atoms/MyEditableText.vue";
+import MyButton from "../atoms/MyButton.vue";
+import MyDrawer from "../atoms/MyDrawer.vue";
+import MyFlyoutMenu from "../atoms/MyFlyoutMenu.vue";
 
 const props = defineProps({
   image: {
