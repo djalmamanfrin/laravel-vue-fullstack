@@ -13,6 +13,7 @@ const useImageStore = defineStore('image', {
     all() {
       return axiosClient.get(`/api/image/`)
         .then(({data}) => {
+          console.log(data)
           this.images = data
         })
     },
@@ -31,8 +32,10 @@ const useImageStore = defineStore('image', {
     update(imageId, fields) {
       return axiosClient.patch('/api/image/' + imageId, fields)
         .then(({data}) => {
+          this.images = this.images.map(item =>
+            item.id === data.id ? { ...item, ...data } : item
+          )
           this.selectedImage = data
-          this.images = this.all()
         })
     },
     delete(imageId) {

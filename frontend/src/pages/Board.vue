@@ -99,6 +99,17 @@ const onColumnDrag = (event, collectionId) => {
 
 }
 
+const onColumnDrop = (event, dropCollectionId) => {
+  console.log('onColumnDrop', dropCollectionId)
+  let dragCollectionId = event.dataTransfer.getData('dragCollectionId')
+  if (dragCollectionId) {
+    boardStore.update({
+      drag_collection_id: dragCollectionId,
+      drop_collection_id: dropCollectionId,
+    }).finally(() => boardStore.get(boardId))
+  }
+}
+
 const onImageDrag = (event, imageId) => {
   event.dataTransfer.dropEffect = 'move'
   event.dataTransfer.effectAllowed = 'move'
@@ -108,16 +119,9 @@ const onImageDrag = (event, imageId) => {
 const onImageDrop = (event, dropCollectionId) => {
   let imageId = event.dataTransfer.getData('imageId')
   if (imageId) {
-    imageStore.update(imageId, {collection_id: dropCollectionId});
+    imageStore.update(imageId, {collection_id: dropCollectionId})
   }
-  let dragCollectionId = event.dataTransfer.getData('dragCollectionId')
-  if (dragCollectionId) {
-    boardStore.update({
-      drag_collection_id: dragCollectionId,
-      drop_collection_id: dropCollectionId,
-    })
-  }
-};
+}
 const getColumnClass = (index) => {
   return (index + 1 === board.value.collections.length)
     ? 'rounded-[calc(var(--radius-lg)+1px)] lg:rounded-r-[calc(2rem+1px)]'
@@ -159,12 +163,12 @@ const getColumnClass = (index) => {
               <span>Owner <b class="pl-1">{{ board.owner.name }}</b></span>
             </div>
             <div class="mt-2 flex items-center text-sm text-gray-500 gap-1">
-              <MyTooltip @click="handleDeleteBoard" position="top" text="The last column is not included in the count" class="flex justify-center items-center cursor-pointer">
+              <MyTooltip position="top" text="The last column is not included in the count" class="flex justify-center items-center cursor-pointer">
                 <PhotoIcon class="block size-7" aria-hidden="true" />
                 <span><b class="pl-1">{{ board.images_counter }} images</b> being worked on</span>
               </MyTooltip>
             </div>
-            <div class="mt-2 flex items-center text-sm text-gray-500 gap-1">
+            <div v-if="board.collections" class="mt-2 flex items-center text-sm text-gray-500 gap-1">
               <MyTooltip @click="handleDeleteBoard" position="top" text="The My local images column is not included in the count" class="flex justify-center items-center cursor-pointer">
                 <ViewColumnsIcon class="block size-7" aria-hidden="true" />
                 <span><b class="pl-1"> {{ board.collections.length }} / 5</b> available collection</span>
@@ -218,7 +222,7 @@ const getColumnClass = (index) => {
             </div>
           </div>
         </div>
-        <template v-if="board.collections.length === 0">
+        <template v-if="board.collections && board.collections.length === 0">
           <div class="relative lg:row-span-2 flex flex-col h-full">
             <div class="absolute inset-px rounded-lg border-2 border-dashed border-gray-300" />
             <div class="flex flex-col flex-1 overflow-auto rounded-lg">
@@ -249,7 +253,7 @@ const getColumnClass = (index) => {
               :key="collection.id"
               draggable="true"
               @dragstart="onColumnDrag($event, collection.id)"
-              @drop="onImageDrop($event, collection.id)"
+              @drop="onColumnDrop($event, collection.id)"
               @dragenter.prevent
               @dragover.prevent
               class="relative lg:row-span-2 flex flex-col h-full"

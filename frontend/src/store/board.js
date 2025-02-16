@@ -40,29 +40,29 @@ const useBoardStore = defineStore('board', {
     update(fields) {
       let boardId = this.board.id
       return axiosClient.patch(`/api/board/${boardId}`, fields)
-        .then(() => {
-          this.get(boardId)
+        .then(({data}) => {
+          this.board = data
         })
     },
     createCollection(fields) {
       let boardId = this.board.id
       return axiosClient.post(`/api/board/${boardId}/collection`, fields)
-        .then(() => {
-          this.get(boardId)
+        .then(({data}) => {
+          this.board = data
         })
     },
     updateCollection(collectionId,fields) {
       let boardId = this.board.id
       return axiosClient.patch(`/api/board/${boardId}/collection/${collectionId}`, fields)
-        .then(() => {
-          this.get(boardId)
+        .then(({data}) => {
+          this.board = data
         })
     },
     deleteCollection(collectionId) {
       let boardId = this.board.id
       return axiosClient.delete(`/api/board/${boardId}/collection/${collectionId}`)
-        .then(() => {
-          this.get(boardId)
+        .then(({data}) => {
+          this.board = data
         })
     },
     fetchRecentChanges(boardId) {
