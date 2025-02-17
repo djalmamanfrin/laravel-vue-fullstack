@@ -80,6 +80,7 @@ const handleBoardNameChanged = (value) => {
 const handleCollectionNameChanged = (value, collectionId) => {
   let capitalizeValue = value.charAt(0).toUpperCase() + value.slice(1)
   boardStore.updateCollection(collectionId, {name: capitalizeValue})
+      .finally(() => boardStore.get(boardId))
 }
 
 watch(() => imageStore.images, () => {

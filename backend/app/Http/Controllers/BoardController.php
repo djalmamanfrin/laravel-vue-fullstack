@@ -59,7 +59,7 @@ class BoardController extends Controller
             'name' => 'Untitled',
             'owner_id' => Auth::id()
         ]);
-        return response()->json($board->load(['collections', 'owner']), Response::HTTP_CREATED);
+        return response()->json($board->load(['collections.images', 'owner']), Response::HTTP_CREATED);
     }
 
     public function update(Request $request, int $boardId): JsonResponse
@@ -91,7 +91,7 @@ class BoardController extends Controller
 
             $board->save();
             DB::commit();
-            return response()->json($board->load(['collections', 'owner']));
+            return response()->json($board->load(['collections.images', 'owner']));
         } catch (\Throwable $exception) {
             DB::rollBack();
             return response()->json([
@@ -130,7 +130,7 @@ class BoardController extends Controller
         $collection->board_id = $board->id;
         $collection->save();
 
-        return response()->json($board->load(['collections', 'owner']));
+        return response()->json($board->load(['collections.images', 'owner']));
     }
 
     public function reorderCollection(Request $request, int $boardId, int $collectionId): JsonResponse
@@ -147,7 +147,7 @@ class BoardController extends Controller
             ->forceFill($request->all())
             ->save();
 
-        return response()->json($board->load(['collections', 'owner']));
+        return response()->json($board->load(['collections.images', 'owner']));
     }
 
     public function deleteCollection(int $boardId, int $collectionId): JsonResponse
@@ -165,7 +165,7 @@ class BoardController extends Controller
             $collection->update(['order' => ++$index]);
         }
 
-        return response()->json($board->load(['collections', 'owner']));
+        return response()->json($board->load(['collections.images', 'owner']));
     }
 
 
