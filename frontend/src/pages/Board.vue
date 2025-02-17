@@ -26,6 +26,9 @@ const drawer = useDrawerStore()
 
 const boardStore = useBoardStore()
 const board = computed(() => boardStore.board)
+const orderedCollections = computed(() => {
+  return board.value.collections.sort((a, b) => a.order - b.order);
+});
 
 const imageStore = useImageStore();
 const images = computed(() => imageStore.images)
@@ -68,7 +71,7 @@ const handleCreateCollection = () => {
   }
   let fields = {name: 'Untitled', order: board.value.collections.length + 1}
   boardStore.createCollection(fields)
-      .catch(error => {})
+      .finally(() => boardStore.get(boardId))
 }
 const handleBoardNameChanged = (value) => {
   boardStore.update({name: value})
@@ -222,7 +225,7 @@ const getColumnClass = (index) => {
             </div>
           </div>
         </div>
-        <template v-if="board.collections && board.collections.length === 0">
+        <template v-if="orderedCollections.length === 0">
           <div class="relative lg:row-span-2 flex flex-col h-full">
             <div class="absolute inset-px rounded-lg border-2 border-dashed border-gray-300" />
             <div class="flex flex-col flex-1 overflow-auto rounded-lg">
@@ -249,7 +252,7 @@ const getColumnClass = (index) => {
         </template>
         <template v-else>
           <div
-              v-for="(collection, index) in board.collections"
+              v-for="(collection, index) in orderedCollections"
               :key="collection.id"
               draggable="true"
               @dragstart="onColumnDrag($event, collection.id)"
